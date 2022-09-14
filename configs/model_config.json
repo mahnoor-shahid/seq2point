@@ -1,0 +1,11 @@
+
+{
+        "CONV_LAYERS": 2,
+        "INPUT_CHANNELS": [1],
+        "OUTPUT_CHANNELS": [32, 16],
+        "CONV_KERNEL": [3, 3],
+        "CONV_STRIDE": [3, 2],
+        "CONV_PADDING": [1, 1],
+        "POOL_KERNEL" : [2, 2],
+        "POOL_STRIDE" : [2, 1]
+}

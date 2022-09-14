@@ -1,0 +1,9 @@
+{
+    "TRAIN_BATCH_SIZE" : 64,
+    "LEARNING_RATE" : 0.001,
+    "NUM_EPOCHS" : 10,
+    "OPTIMIZER": "optim.Adam", 
+    "LOSS": "nn.MSELoss",
+    "LOSS_REDUCTION": "mean",
+    "EARLY_STOPPING_THRESHOLD": 3
+}
