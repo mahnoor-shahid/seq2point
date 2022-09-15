@@ -101,12 +101,13 @@ class SEQ2POINT(nn.Module):
         """
         try:
             print('Saving the model...')
-            root_path = os.path.join(MODEL_CONFIG['SAVE_PATH']) # Specify path
+            print(GENERAL_CONFIG['SAVE_PATH'] )
 
             # Check whether the specified path exists or not
-            if not os.path.exists(root_path):
-                os.makedirs(root_path) 
-            torch.save(self.state_dict(), os.path.join(MODEL_CONFIG['SAVE_PATH'],f'{filename}.pt'))
+            if not os.path.exists(GENERAL_CONFIG['SAVE_PATH'] ):
+                print("no path")
+                os.makedirs(GENERAL_CONFIG['SAVE_PATH'] ) 
+            torch.save(self.state_dict(), os.path.join(GENERAL_CONFIG['SAVE_PATH'],f'{filename}.pt'))
             
         except Exception as e:
             print("Error occured in save_model method due to ", e)
@@ -118,7 +119,7 @@ class SEQ2POINT(nn.Module):
         """
         try:
             print('Loading the model...')
-            self.load_state_dict(torch.load(os.path.join(MODEL_CONFIG['SAVE_PATH'],MODEL_CONFIG['LOAD_MODEL'])))
+            self.load_state_dict(torch.load(os.path.join(GENERAL_CONFIG['SAVE_PATH'],GENERAL_CONFIG['LOAD_MODEL'])))
         
         except Exception as e:
             print(f"Error occured in load_model method due to ", e)
@@ -151,8 +152,31 @@ class SEQ2POINT(nn.Module):
                 summary(model, (1,599)) ## in progress
 
             else:
-                raise Exception('In general_config, value specified for PRE_TRAINED_MODEL_FLAG ')
+                raise Exception('In general_config, value specified for PRE_TRAINED_MODEL_FLAG is undefined')
         
         except Exception as e:
             print(f"Error occured in run wrapper method due to ", e)
+            
+
+    def inference():
+        """
+        """
+        try:
+            model.eval()
+            start_test_time = time.time()
+            test_scores = []
+            with torch.no_grad():
+                for batch_idx, (data, target) in enumerate(test_loader):
+                    data = data.to(set_device)
+
+                    predictions = model.forward(data)
+
+                    ## progress test_scores.append()
+
+            end_test_time = time.time()
+            print(f"Testing Loss : {training_loss_per_epoch[-1]}, Time consumption: {end_test_time-start_test_time}s")
+
+
+        except Exception as e:
+                print('Error occured in inference method due to ', e)
             
