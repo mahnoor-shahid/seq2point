@@ -1,7 +1,7 @@
 
 {
-    "DATA_PATH": "data/",
+    "DATA_PATH": "../data/",
     "PRE-TRAINED_MODEL_FLAG": false,         
     "SAVE_PATH": "../models/",
-    "LOAD_MODEL": "0.0014488688902929425.pt"
+    "LOAD_MODEL": ""
 }

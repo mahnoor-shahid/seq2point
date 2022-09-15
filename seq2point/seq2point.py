@@ -1,7 +1,7 @@
 
 import torch.nn as nn
-
-class DeepOneClass(nn.Module):
+            
+class SEQ2POINT(nn.Module):
 
     def __init__(self, model_config: dict):
         """
@@ -11,65 +11,72 @@ class DeepOneClass(nn.Module):
 
         Parameters 
         ----------
-        model_params : dictionary
+        model_config : dictionary
             provides the model with the required input channels, output channels, kernel size, stride and padding values
             
-            model_params = 
+            model_config = 
                 {
                     'CONV_LAYERS': int,
-                    'NODES': list(int),
-                    'CONV_KERNEL': list(int),
-                    'CONV_STRIDE': int,
-                    'CONV_PADDING': int,
-                    'POOL_KERNEL' : int,
-                    'POOL_STRIDE' : int
+                    'INPUT_CHANNELS': list(int),
+                    'LEFT_PAD': list(int),
+                    'RIGHT_PAD': list(int),
+                    'OUTPUT_CHANNELS': list(int),
+                    'KERNEL': list(int),
+                    'STRIDE': int,
+                    'PADDING': int,
+                    'SEQUENCE_LENGTH': int
                 }
         """
         try:
-            display("Initializing deep_one_class model archiecture")
-            super(deep_one_class, self).__init__()
+            display("Initializing seq2point model archiecture")
+            super(seq2point, self).__init__()
             
-            # assert model_params['SEQUENCE_LENGTH'] >= 599, f"Provided sequence length is {model_params['SEQUENCE_LENGTH']} while it should be atleast >=599"
             self.config = model_config
             self.channels = [i for sublist in [self.config['INPUT_CHANNELS'], self.config['OUTPUT_CHANNELS']] for i in sublist]
-            self.layers = []
             
+            assert self.config['SEQUENCE_LENGTH'] >= 599, f"Provided sequence length is {self.config['SEQUENCE_LENGTH']} while it should be atleast >=599"
+            
+            layers = []
             for layer in range(0, self.config['CONV_LAYERS']):
-                self.layers.append(
-                    nn.Conv2d(
+                layers.append(
+                    nn.ConstantPad1d(
+                        padding=(self.config['LEFT_PAD'][layer], 
+                                 self.config['RIGHT_PAD'][layer]), value=0))
+                layers.append(
+                    nn.Conv1d(
                         in_channels=self.channels[layer], 
                         out_channels=self.channels[layer+1], 
-                        kernel_size=self.config['CONV_KERNEL'][layer],
-                        stride=self.config['CONV_STRIDE'], 
-                        padding=self.config['CONV_PADDING']))
+                        kernel_size=self.config['KERNEL'][layer],
+                        stride=self.config['STRIDE'], 
+                        padding=self.config['PADDING']))
                 self.layers.append(nn.ReLU(inplace=True))
-                self.layers.append(nn.MaxPool2d(kernel_size=model_params['CONV_KERNEL'], stride=model_params['CONV_STRIDE']))
+            
+            layers.append(
+                nn.Linear(
+                    in_features=50 * self.config['SEQUENCE_LENGTH'], 
+                    out_features=1024))
+            layers.append(
+                nn.ReLU(inplace=True))
+            layers.append(
+                nn.Linear(
+                    in_features=1024, 
+                    out_features=1))
 
-            self.features = nn.Sequential(*self.layers)
-            self.conv_out = nn.Conv2d(self.channels[-1], num_classes, 2)
-            self.softmax = nn.Softmax()
+            self.layers = nn.Sequential(*layers)
 
         except Exception:
-            print('Error occured in initializing the model architecture due to ', e)
+            raise 
 
-            
     def forward(self, x):
         """
         """
         try:
-            num_sam = x.shape[0]
-            if len(x.shape) != 4:
-                x = x.view(-1,1,28,28)
-
-            feat = self.features(x)
-            h = self.conv_out(feat)
-            output = h.view(num_sam,-1)
-            return output, feat
+            return self.layers(x)
 
         except Exception as e:
             print('Error occured in forward method due to ', e)
-    
-    
+ 
+
     def save_model(self, filename):
         """
         Save the best model to the disk location specified in general_config.
@@ -97,3 +104,4 @@ class DeepOneClass(nn.Module):
         
         except Exception as e:
             print(f"Error occured in load_model method due to ", e)
+            

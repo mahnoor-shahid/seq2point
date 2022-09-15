@@ -1,11 +1,14 @@
 
 {
-        "CONV_LAYERS": 2,
-        "INPUT_CHANNELS": [1],
-        "OUTPUT_CHANNELS": [32, 16],
-        "CONV_KERNEL": [3, 3],
-        "CONV_STRIDE": [3, 2],
-        "CONV_PADDING": [1, 1],
-        "POOL_KERNEL" : [2, 2],
-        "POOL_STRIDE" : [2, 1]
+        "CONV_LAYERS": 5,
+        "INPUT_CHANNELS": [1, 30, 30, 40, 50],
+        "OUTPUT_CHANNELS": [30, 30, 40, 50, 50],
+        "LEFT_PAD": [4, 3, 2, 2, 2],
+        "RIGHT_PAD": [5, 4, 3, 2, 2],
+        "CONV_KERNEL": [10, 8, 6, 5, 5],
+        "CONV_STRIDE": [1],
+        "CONV_PADDING": [0],
+        "POOL_KERNEL" : [],
+        "POOL_STRIDE" : [],
+        "SEQUENCE_LENGTH": 599
 }
