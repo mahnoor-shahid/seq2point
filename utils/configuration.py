@@ -1,7 +1,5 @@
 
 import json
-from pprint import pprint
-
 
 def get_config_from_json(description, config_file):
     """
@@ -13,8 +11,7 @@ def get_config_from_json(description, config_file):
     with open(config_file, 'r') as json_file:
         try:
             config_dict = json.load(json_file)
-            print(f"Followings are the {description} of your experiment..")
-            pprint(config_dict)
+            config_dict['DESCRIPTION']= description
             return config_dict
         
         except ValueError:

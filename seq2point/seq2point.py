@@ -1,9 +1,10 @@
 
 import torch.nn as nn
+from pprint import pprint
             
 class SEQ2POINT(nn.Module):
 
-    def __init__(self, model_config: dict):
+    def __init__(self):
         """
         This class is created to specify the Seq2Point Network.
         Refer to "ZHANG C, ZHONG M, WANG Z, et al. Sequence-to-point learning with neural networks for non-intrusive load monitoring.
@@ -11,27 +12,30 @@ class SEQ2POINT(nn.Module):
 
         Parameters 
         ----------
-        model_config : dictionary
+        MODEL_CONFIG : dictionary
             provides the model with the required input channels, output channels, kernel size, stride and padding values
             
-            model_config = 
+            MODEL_CONFIG = 
                 {
                     'CONV_LAYERS': int,
                     'INPUT_CHANNELS': list(int),
                     'LEFT_PAD': list(int),
                     'RIGHT_PAD': list(int),
                     'OUTPUT_CHANNELS': list(int),
-                    'KERNEL': list(int),
-                    'STRIDE': int,
-                    'PADDING': int,
+                    'CONV_KERNEL': list(int),
+                    'CONV_STRIDE': int,
+                    'CONV_PADDING': int,
                     'SEQUENCE_LENGTH': int
                 }
         """
         try:
-            display("Initializing seq2point model archiecture")
-            super(seq2point, self).__init__()
+            print(f"Followings are the {MODEL_CONFIG['DESCRIPTION']} of your experiment..")
+            pprint(MODEL_CONFIG)
             
-            self.config = model_config
+            print("\nInitializing SEQ2POINT model archiecture")
+            super(SEQ2POINT, self).__init__()
+            
+            self.config = MODEL_CONFIG
             self.channels = [i for sublist in [self.config['INPUT_CHANNELS'], self.config['OUTPUT_CHANNELS']] for i in sublist]
             
             assert self.config['SEQUENCE_LENGTH'] >= 599, f"Provided sequence length is {self.config['SEQUENCE_LENGTH']} while it should be atleast >=599"
@@ -46,10 +50,10 @@ class SEQ2POINT(nn.Module):
                     nn.Conv1d(
                         in_channels=self.channels[layer], 
                         out_channels=self.channels[layer+1], 
-                        kernel_size=self.config['KERNEL'][layer],
-                        stride=self.config['STRIDE'], 
-                        padding=self.config['PADDING']))
-                self.layers.append(nn.ReLU(inplace=True))
+                        kernel_size=self.config['CONV_KERNEL'][layer],
+                        stride=self.config['CONV_STRIDE'], 
+                        padding=self.config['CONV_PADDING']))
+                layers.append(nn.ReLU(inplace=True))
             
             layers.append(
                 nn.Linear(
@@ -65,7 +69,10 @@ class SEQ2POINT(nn.Module):
             self.layers = nn.Sequential(*layers)
 
         except Exception:
-            raise 
+            pass
+        
+        finally:
+            print("\nSEQ2POINT model archiecture has been initialized")
 
     def forward(self, x):
         """
@@ -88,7 +95,7 @@ class SEQ2POINT(nn.Module):
         """
         try:
             print('Saving the model...')
-            torch.save(self.state_dict(), os.path.join(model_config['SAVE_PATH'],f'{filename}.pt'))
+            torch.save(self.state_dict(), os.path.join(MODEL_CONFIG['SAVE_PATH'],f'{filename}.pt'))
             
         except Exception as e:
             print("Error occured in save_model method due to ", e)
@@ -100,7 +107,7 @@ class SEQ2POINT(nn.Module):
         """
         try:
             print('Loading the model...')
-            self.load_state_dict(torch.load(os.path.join(model_config['SAVE_PATH'],model_config['LOAD_MODEL'])))
+            self.load_state_dict(torch.load(os.path.join(MODEL_CONFIG['SAVE_PATH'],MODEL_CONFIG['LOAD_MODEL'])))
         
         except Exception as e:
             print(f"Error occured in load_model method due to ", e)
