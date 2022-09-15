@@ -1,6 +1,12 @@
 
+import torch
 import torch.nn as nn
+from train.training import network_training
+from utils.training_utilities import initialize_weights, set_criterion, set_optimization
 from pprint import pprint
+from torchsummary import summary
+import os
+
             
 class SEQ2POINT(nn.Module):
 
@@ -95,6 +101,11 @@ class SEQ2POINT(nn.Module):
         """
         try:
             print('Saving the model...')
+            root_path = os.path.join(MODEL_CONFIG['SAVE_PATH']) # Specify path
+
+            # Check whether the specified path exists or not
+            if not os.path.exists(root_path):
+                os.makedirs(root_path) 
             torch.save(self.state_dict(), os.path.join(MODEL_CONFIG['SAVE_PATH'],f'{filename}.pt'))
             
         except Exception as e:
@@ -111,4 +122,37 @@ class SEQ2POINT(nn.Module):
         
         except Exception as e:
             print(f"Error occured in load_model method due to ", e)
+            
+    
+    def run(self):
+        """
+        
+        """
+        try:
+            if GENERAL_CONFIG['PRE_TRAINED_MODEL_FLAG'] == False:
+                
+                print(f"Followings are the {TRAINING_CONFIG['DESCRIPTION']} of your experiment..")
+                pprint(TRAINING_CONFIG) 
+                self.apply(initialize_weights) 
+                
+                print("\nSummary of the model architecture")
+                summary(self, (1,599)) ## in progress
+                
+                criterion = set_criterion()
+                optimizer = set_optimization(self)
+                train_loader = torch.randn(5,2)
+                validation_loader = torch.randn(2,2)
+
+                train_loss, validation_loss = network_training(self, criterion, optimizer, train_loader, validation_loader)
+                return train_loss, validation_loss
+
+            elif GENERAL_CONFIG['PRE_TRAINED_MODEL_FLAG'] == True:
+                model.load_model() ## in progress
+                summary(model, (1,599)) ## in progress
+
+            else:
+                raise Exception('In general_config, value specified for PRE_TRAINED_MODEL_FLAG ')
+        
+        except Exception as e:
+            print(f"Error occured in run wrapper method due to ", e)
             

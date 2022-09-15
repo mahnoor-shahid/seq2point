@@ -1,18 +1,22 @@
 
+import torch
 from torch.utils.tensorboard import SummaryWriter
+from utils.training_utilities import early_stopping, set_GPU
 import time
 import numpy as np
 
-def network_training():
+
+def network_training(model, criterion, optimizer, train_loader, validation_loader):
     """
     """
     try:
+        print("\nTraining the model architecture...")     
         training_loss_per_epoch = []
         validation_loss_per_epoch = []
         best_loss, idle_training_epochs = None, 0
-        writer = SummaryWriter(comment='training_visuaization')
+        writer = SummaryWriter(comment='training_visualization')
 
-        for epoch in range(0, training_config['NUM_EPOCHS']):
+        for epoch in range(0, TRAINING_CONFIG['NUM_EPOCHS']):
 
             if early_stopping(idle_training_epochs):
                 break
@@ -36,7 +40,7 @@ def network_training():
                 # optimizer.step()
 
                 # if (batch_idx+1) % 100 == 0:
-                #     print(f"Epoch : [{epoch+1}/{training_config['NUM_EPOCHS']}] | Step : [{batch_index+1}/{len(train_loader)}] | Loss : {loss.item()}")
+                #     print(f"Epoch : [{epoch+1}/{TRAINING_CONFIG['NUM_EPOCHS']}] | Step : [{batch_index+1}/{len(train_loader)}] | Loss : {loss.item()}")
             
             training_loss_per_epoch.append(np.min(train_loss_scores))
             
@@ -54,11 +58,12 @@ def network_training():
             validation_loss_per_epoch.append(np.min(validation_loss_scores))
             
             end_training_time = time.time()
-            print(f"Epoch : [{epoch}/{training_config['NUM_EPOCHS']}] | Training Loss : {training_loss_per_epoch[-1]}, | Validation Loss : {validation_loss_per_epoch[-1]}, | Time consumption: {end_training_time-start_training_time}s")
+            print(f"Epoch : [{epoch}/{TRAINING_CONFIG['NUM_EPOCHS']}] | Training Loss : {training_loss_per_epoch[-1]}, | Validation Loss : {validation_loss_per_epoch[-1]}, | \
+            Time consumption: {end_training_time-start_training_time}s")
             
             if best_loss is None:
                 best_loss = validation_loss_per_epoch[-1]
-            elif best_loss > validation_loss_per_epoch[-1]:
+            elif best_loss < validation_loss_per_epoch[-1]:
                 best_loss = validation_loss_per_epoch[-1]
                 idle_training_epochs = 0
                 model.save_model(filename=f"{best_loss}")  

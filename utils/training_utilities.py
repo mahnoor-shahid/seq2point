@@ -27,7 +27,7 @@ def set_optimization(model):
     """
     """
     
-    try:     
+    try:
         return eval(TRAINING_CONFIG['OPTIMIZER'])(model.parameters(), lr=TRAINING_CONFIG['LEARNING_RATE'])
     
     except Exception as e:
