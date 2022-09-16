@@ -1,8 +1,5 @@
 
-import torch
-import torch.nn as nn
-from train.training import network_training
-from utils.training_utilities import initialize_weights, set_criterion, set_optimization
+
 from pprint import pprint
 from torchsummary import summary
 import os
@@ -39,41 +36,39 @@ class SEQ2POINT(nn.Module):
             print(f"Followings are the {MODEL_CONFIG['DESCRIPTION']} of your network architecture..")
             pprint(MODEL_CONFIG)
             
-
             super(SEQ2POINT, self).__init__()
-            
             self.config = MODEL_CONFIG
-            self.channels = [i for sublist in [self.config['INPUT_CHANNELS'], self.config['OUTPUT_CHANNELS']] for i in sublist]
             
             assert self.config['SEQUENCE_LENGTH'] >= 599, f"Provided sequence length is {self.config['SEQUENCE_LENGTH']} while it should be atleast >=599"
             
-            layers = []
+            conv_layers = []
+            dense_layers = []
             for layer in range(0, self.config['CONV_LAYERS']):
-                layers.append(
+                conv_layers.append(
                     nn.ConstantPad1d(
                         padding=(self.config['LEFT_PAD'][layer], 
                                  self.config['RIGHT_PAD'][layer]), value=0))
-                layers.append(
+                conv_layers.append(
                     nn.Conv1d(
-                        in_channels=self.channels[layer], 
-                        out_channels=self.channels[layer+1], 
+                        in_channels=self.config['INPUT_CHANNELS'][layer], 
+                        out_channels=self.config['OUTPUT_CHANNELS'][layer], 
                         kernel_size=self.config['CONV_KERNEL'][layer],
                         stride=self.config['CONV_STRIDE'], 
                         padding=self.config['CONV_PADDING']))
-                layers.append(nn.ReLU(inplace=True))
+                conv_layers.append(nn.ReLU(inplace=True))
+            self.conv = nn.Sequential(*conv_layers)
             
-            layers.append(
+            dense_layers.append(
                 nn.Linear(
-                    in_features=50 * self.config['SEQUENCE_LENGTH'], 
-                    out_features=1024))
-            layers.append(
+                    in_features=self.config['LINEAR_INPUT'][0], 
+                    out_features=self.config['LINEAR_OUTPUT'][0]))
+            dense_layers.append(
                 nn.ReLU(inplace=True))
-            layers.append(
+            dense_layers.append(
                 nn.Linear(
-                    in_features=1024, 
-                    out_features=1))
-
-            self.layers = nn.Sequential(*layers)
+                    in_features=self.config['LINEAR_INPUT'][1], 
+                    out_features=self.config['LINEAR_OUTPUT'][1]))
+            self.dense = nn.Sequential(*dense_layers)
 
         except Exception:
             pass
@@ -85,7 +80,9 @@ class SEQ2POINT(nn.Module):
         """
         """
         try:
-            return self.layers(x)
+            x = self.conv(x)
+            x = self.dense(x.view(-1, 50 * self.config['SEQUENCE_LENGTH']))
+            return x.view(-1, 1)
 
         except Exception as e:
             print('Error occured in forward method due to ', e)
@@ -120,7 +117,7 @@ class SEQ2POINT(nn.Module):
             print(f"Error occured in load_model method due to ", e)
             
     
-    def run(self):
+    def run(self, train_loader, validation_loader):
         """
         
         """
@@ -136,8 +133,6 @@ class SEQ2POINT(nn.Module):
                 
                 criterion = set_criterion()
                 optimizer = set_optimization(self)
-                train_loader = torch.randn(5,2)
-                validation_loader = torch.randn(2,2)
 
                 train_loss, validation_loss = network_training(self, criterion, optimizer, train_loader, validation_loader)
                 return train_loss, validation_loss

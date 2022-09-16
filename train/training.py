@@ -1,7 +1,5 @@
-
 import torch
 from torch.utils.tensorboard import SummaryWriter
-from utils.training_utilities import early_stopping, set_GPU
 import time
 import numpy as np
 
@@ -14,7 +12,7 @@ def network_training(model, criterion, optimizer, train_loader, validation_loade
         training_loss_per_epoch = []
         validation_loss_per_epoch = []
         best_loss, idle_training_epochs = None, 0
-        writer = SummaryWriter(comment='training_visualization')
+        writer = SummaryWriter(comment='_training_visualization')
 
         for epoch in range(0, TRAINING_CONFIG['NUM_EPOCHS']):
 
@@ -28,11 +26,12 @@ def network_training(model, criterion, optimizer, train_loader, validation_loade
 
             for batch_idx, (data, target) in enumerate(train_loader):
                 data = data.to(set_GPU())
+                target = target.to(set_GPU())
 
                 # predictions = model.forward(data.to(set_GPU()))
-                predictions = torch.randn(1,1)
+                predictions = torch.randn(1,1).to(set_GPU())
 
-                loss = criterion(predictions.to(set_GPU()), target.to(set_GPU()))
+                loss = criterion(target, predictions)
                 train_loss_scores.append(loss.item())
                 
                 # optimizer.zero_grad()
@@ -48,9 +47,10 @@ def network_training(model, criterion, optimizer, train_loader, validation_loade
             with torch.no_grad():
                 for batch_idx, (data, target) in enumerate(validation_loader):
                     data = data.to(set_GPU())
+                    target = target.to(set_GPU())                                                  
                     
                     # predictions = model.forward(data.to(set_GPU()))
-                    predictions = torch.randn(1,1)
+                    predictions = torch.randn(1,1).to(set_GPU())
                     
                     loss = criterion(predictions.to(set_GPU()), target.to(set_GPU()))
                     validation_loss_scores.append(loss.item())
@@ -60,14 +60,15 @@ def network_training(model, criterion, optimizer, train_loader, validation_loade
             end_training_time = time.time()
             print(f"Epoch : [{epoch}/{TRAINING_CONFIG['NUM_EPOCHS']}] | Training Loss : {training_loss_per_epoch[-1]}, | Validation Loss : {validation_loss_per_epoch[-1]}, | Time consumption: {end_training_time-start_training_time}s")
             
-            if best_loss is None:
+            if best_loss is None or best_loss <= validation_loss_per_epoch[-1]:
                 best_loss = validation_loss_per_epoch[-1]
-            elif best_loss < validation_loss_per_epoch[-1]:
+                idle_training_epochs = idle_training_epochs + 1
+            elif best_loss > validation_loss_per_epoch[-1]:
                 best_loss = validation_loss_per_epoch[-1]
                 idle_training_epochs = 0
                 model.save_model(filename=f"{best_loss}")  
             else:
-                idle_training_epochs +=1
+                pass
             
             for name,param in model.named_parameters():
                 pass

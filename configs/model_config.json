@@ -6,9 +6,12 @@
         "LEFT_PAD": [4, 3, 2, 2, 2],
         "RIGHT_PAD": [5, 4, 3, 2, 2],
         "CONV_KERNEL": [10, 8, 6, 5, 5],
-        "CONV_STRIDE": [1],
-        "CONV_PADDING": [0],
+        "CONV_STRIDE": 1,
+        "CONV_PADDING": 0,
         "POOL_KERNEL" : [],
         "POOL_STRIDE" : [],
-        "SEQUENCE_LENGTH": 599
+        "SEQUENCE_LENGTH": 599,
+        "LINEAR_LAYERS": 2,
+        "LINEAR_INPUT": [29950, 1024],
+        "LINEAR_OUTPUT": [1024, 1]
 }
