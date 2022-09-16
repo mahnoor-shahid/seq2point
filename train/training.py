@@ -1,5 +1,7 @@
+
 import torch
 from torch.utils.tensorboard import SummaryWriter
+from utils.training_utilities import early_stopping, set_GPU
 import time
 import numpy as np
 
@@ -29,7 +31,7 @@ def network_training(model, criterion, optimizer, train_loader, validation_loade
                 target = target.to(set_GPU())
 
                 # predictions = model.forward(data.to(set_GPU()))
-                predictions = torch.randn(1,1).to(set_GPU())
+                predictions = torch.randn(1,2).to(set_GPU())
 
                 loss = criterion(target, predictions)
                 train_loss_scores.append(loss.item())
