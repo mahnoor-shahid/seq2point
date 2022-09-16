@@ -58,8 +58,7 @@ def network_training(model, criterion, optimizer, train_loader, validation_loade
             validation_loss_per_epoch.append(np.min(validation_loss_scores))
             
             end_training_time = time.time()
-            print(f"Epoch : [{epoch}/{TRAINING_CONFIG['NUM_EPOCHS']}] | Training Loss : {training_loss_per_epoch[-1]}, | Validation Loss : {validation_loss_per_epoch[-1]}, | \
-            Time consumption: {end_training_time-start_training_time}s")
+            print(f"Epoch : [{epoch}/{TRAINING_CONFIG['NUM_EPOCHS']}] | Training Loss : {training_loss_per_epoch[-1]}, | Validation Loss : {validation_loss_per_epoch[-1]}, | Time consumption: {end_training_time-start_training_time}s")
             
             if best_loss is None:
                 best_loss = validation_loss_per_epoch[-1]

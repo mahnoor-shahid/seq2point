@@ -35,10 +35,11 @@ class SEQ2POINT(nn.Module):
                 }
         """
         try:
-            print(f"Followings are the {MODEL_CONFIG['DESCRIPTION']} of your experiment..")
+            print("\nInitializing SEQ2POINT model archiecture\n")
+            print(f"Followings are the {MODEL_CONFIG['DESCRIPTION']} of your network architecture..")
             pprint(MODEL_CONFIG)
             
-            print("\nInitializing SEQ2POINT model archiecture")
+
             super(SEQ2POINT, self).__init__()
             
             self.config = MODEL_CONFIG
@@ -78,7 +79,7 @@ class SEQ2POINT(nn.Module):
             pass
         
         finally:
-            print("\nSEQ2POINT model archiecture has been initialized")
+            print("\nSEQ2POINT model archiecture has been initialized\n")
 
     def forward(self, x):
         """
@@ -101,12 +102,6 @@ class SEQ2POINT(nn.Module):
         """
         try:
             print('Saving the model...')
-            print(GENERAL_CONFIG['SAVE_PATH'] )
-
-            # Check whether the specified path exists or not
-            if not os.path.exists(GENERAL_CONFIG['SAVE_PATH'] ):
-                print("no path")
-                os.makedirs(GENERAL_CONFIG['SAVE_PATH'] ) 
             torch.save(self.state_dict(), os.path.join(GENERAL_CONFIG['SAVE_PATH'],f'{filename}.pt'))
             
         except Exception as e:

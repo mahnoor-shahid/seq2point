@@ -1,6 +1,6 @@
 
 {
-    "DATA_PATH": "../data/",
+    "DATA_PATH": "data/refit/",
     "PRE_TRAINED_MODEL_FLAG": false,         
     "SAVE_PATH": "models/",
     "LOAD_MODEL": ""

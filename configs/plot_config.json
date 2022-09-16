@@ -1,0 +1,18 @@
+
+{
+    "LATEX": false,
+    "FONT_SIZE": 12.0,         
+    "LEGEND_HANDLE": 5.0,
+    "LEGEND_FONT_SIZE": 11.0,
+    "LEGEND_LOCATION": "upper right",
+    "OPACITY": 0.7,
+    "FIG_XSIZE": 14.0,         
+    "FIG_YSIZE": 6.0,
+    "MARKER": "o",
+    "TICK_DIRECTION": "out",
+    "MAJOR_TICKS": 5.0,
+    "MINOR_TICKS": 3.0,
+    "COLORS": ["dodgerblue", "coral", "mediumpurple", "lightseagreen", "peru", "hotpink", "teal", "orange" ],
+    "STYLE": "default"
+}
+
