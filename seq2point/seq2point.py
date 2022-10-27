@@ -1,4 +1,5 @@
 
+import torch
 import torch.nn as nn
 from pprint import pprint
 from torchsummary import summary

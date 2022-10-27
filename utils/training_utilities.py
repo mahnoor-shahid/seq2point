@@ -63,7 +63,7 @@ def early_stopping(idle_training_epochs):
     """
     try:
         if idle_training_epochs == TRAINING_CONFIG['EARLY_STOPPING_THRESHOLD']:
-            print("Earlystopping is calling it off because validation loss did not improve after {} epochs, therefore e".format(idle_training_epochs))
+            print("Earlystopping is calling it off because validation loss did not improve after {} epochs".format(idle_training_epochs))
             return True 
     
     except Exception as e:

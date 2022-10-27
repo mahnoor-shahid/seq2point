@@ -8,8 +8,8 @@ def plot_traces(traces: list, labels: list, axis_labels: list, colors = None,  t
     
     """
     try:
-        print(f"\nFollowings are the {PLOT_CONFIG['DESCRIPTION']} of your project..")
-        pprint(PLOT_CONFIG)
+        # print(f"\nFollowings are the {PLOT_CONFIG['DESCRIPTION']} of your project..")
+        # pprint(PLOT_CONFIG)
 
         plt.style.use(PLOT_CONFIG['STYLE'])
         plt.rcParams['text.usetex'] = PLOT_CONFIG['LATEX']

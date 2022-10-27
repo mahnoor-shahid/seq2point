@@ -54,7 +54,7 @@ def network_training(model, criterion, optimizer, train_loader, validation_loade
                     # predictions = model.forward(data.to(set_GPU()))
                     predictions = torch.randn(1,1).to(set_GPU())
                     
-                    loss = criterion(predictions.to(set_GPU()), target.to(set_GPU()))
+                    loss = criterion(target, predictions)
                     validation_loss_scores.append(loss.item())
                     
             validation_loss_per_epoch.append(np.min(validation_loss_scores))
