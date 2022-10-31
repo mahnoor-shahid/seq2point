@@ -1,7 +1,7 @@
 __pycache__
 .ipynb_checkpoints
 *.pkl
-/refit_loader
+
 /models
 /runs
 /data
