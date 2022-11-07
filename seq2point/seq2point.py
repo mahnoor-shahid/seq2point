@@ -85,7 +85,7 @@ class SEQ2POINT(nn.Module):
         try:
             x = self.conv(x)
             x = self.dense(x.view(-1, 50 * self.config['SEQUENCE_LENGTH']))
-            return x.view(-1, 1)
+            return x
 
         except Exception as e:
             print('Error occured in forward method due to ', e)

@@ -1,6 +1,6 @@
 
 import torch
-from torch.utils.tensorboard import SummaryWriter
+# from torch.utils.tensorboard import SummaryWriter ### in progress
 from utils.training_utilities import early_stopping, set_GPU
 import time
 import numpy as np
@@ -14,7 +14,7 @@ def network_training(model, criterion, optimizer, train_loader, validation_loade
         training_loss_per_epoch = []
         validation_loss_per_epoch = []
         best_loss, idle_training_epochs = None, 0
-        writer = SummaryWriter(comment='_training_visualization')
+        # writer = SummaryWriter(comment='_training_visualization')
 
         for epoch in range(0, TRAINING_CONFIG['NUM_EPOCHS']):
 
@@ -27,32 +27,36 @@ def network_training(model, criterion, optimizer, train_loader, validation_loade
             validation_loss_scores= []
 
             for batch_idx, (data, target) in enumerate(train_loader):
-                data = data.to(set_GPU())
-                target = target.to(set_GPU())
-
-                # predictions = model.forward(data.to(set_GPU()))
-                predictions = torch.randn(1,2).to(set_GPU())
+                
+                data = data[:, None].to(set_GPU())
+                target = target[:, None].to(set_GPU())
+                # print(data.shape)
+                # print('targets')
+                # print(target.shape)
+                predictions = model.forward(data)[:, None].to(set_GPU())
+                # print("predictions")
+                # print(predictions.shape)
 
                 loss = criterion(target, predictions)
                 train_loss_scores.append(loss.item())
                 
-                # optimizer.zero_grad()
-                # loss.backward()
-                # optimizer.step()
+                optimizer.zero_grad()
+                loss.backward()
+                optimizer.step()
 
-                # if (batch_idx+1) % 100 == 0:
-                #     print(f"Epoch : [{epoch+1}/{TRAINING_CONFIG['NUM_EPOCHS']}] | Step : [{batch_index+1}/{len(train_loader)}] | Loss : {loss.item()}")
+                if (batch_idx+1) % 100 == 0:
+                    print(f"Epoch : [{epoch+1}/{TRAINING_CONFIG['NUM_EPOCHS']}] | Step : [{batch_idx+1}] | Loss : {loss.item()}")
             
             training_loss_per_epoch.append(np.min(train_loss_scores))
             
             model.eval()
             with torch.no_grad():
                 for batch_idx, (data, target) in enumerate(validation_loader):
-                    data = data.to(set_GPU())
-                    target = target.to(set_GPU())                                                  
+                    data = data[:, None].to(set_GPU())
+                    target = target[:, None].to(set_GPU())                                                  
                     
                     # predictions = model.forward(data.to(set_GPU()))
-                    predictions = torch.randn(1,1).to(set_GPU())
+                    predictions = model.forward(data)[:, None].to(set_GPU())
                     
                     loss = criterion(target, predictions)
                     validation_loss_scores.append(loss.item())
@@ -68,7 +72,8 @@ def network_training(model, criterion, optimizer, train_loader, validation_loade
             elif best_loss > validation_loss_per_epoch[-1]:
                 best_loss = validation_loss_per_epoch[-1]
                 idle_training_epochs = 0
-                model.save_model(filename=f"{best_loss}")  
+                time = time.now()
+                model.save_model(filename=f"{time}")  
             else:
                 pass
             
@@ -76,7 +81,7 @@ def network_training(model, criterion, optimizer, train_loader, validation_loade
                 pass
                 # writer.add_histogram(name + '_grad', param.grad, epoch)
                 # writer.add_histogram(name + '_data', param, epoch)
-            writer.add_scalars("Bleh", {"Check":best_loss}, epoch)
+            # writer.add_scalars("Bleh", {"Check":best_loss}, epoch)
         
         return training_loss_per_epoch, validation_loss_per_epoch
     
