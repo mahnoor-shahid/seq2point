@@ -42,8 +42,6 @@ class SEQ2POINT(nn.Module):
             super(SEQ2POINT, self).__init__()
             self.config = MODEL_CONFIG
             
-            assert self.config['SEQUENCE_LENGTH'] >= 599, f"Provided sequence length is {self.config['SEQUENCE_LENGTH']} while it should be atleast >=599"
-            
             conv_layers = []
             dense_layers = []
             for layer in range(0, self.config['CONV_LAYERS']):
