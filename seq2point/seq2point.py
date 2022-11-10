@@ -40,35 +40,35 @@ class SEQ2POINT(nn.Module):
             pprint(MODEL_CONFIG)
             
             super(SEQ2POINT, self).__init__()
-            self.config = MODEL_CONFIG
+            self.__config = MODEL_CONFIG
             
             conv_layers = []
             dense_layers = []
-            for layer in range(0, self.config['CONV_LAYERS']):
+            for layer in range(0, self.__config['CONV_LAYERS']):
                 conv_layers.append(
                     nn.ConstantPad1d(
-                        padding=(self.config['LEFT_PAD'][layer], 
-                                 self.config['RIGHT_PAD'][layer]), value=0))
+                        padding=(self.__config['LEFT_PAD'][layer], 
+                                 self.__config['RIGHT_PAD'][layer]), value=0))
                 conv_layers.append(
                     nn.Conv1d(
-                        in_channels=self.config['INPUT_CHANNELS'][layer], 
-                        out_channels=self.config['OUTPUT_CHANNELS'][layer], 
-                        kernel_size=self.config['CONV_KERNEL'][layer],
-                        stride=self.config['CONV_STRIDE'], 
-                        padding=self.config['CONV_PADDING']))
+                        in_channels=self.__config['INPUT_CHANNELS'][layer], 
+                        out_channels=self.__config['OUTPUT_CHANNELS'][layer], 
+                        kernel_size=self.__config['CONV_KERNEL'][layer],
+                        stride=self.__config['CONV_STRIDE'], 
+                        padding=self.__config['CONV_PADDING']))
                 conv_layers.append(nn.ReLU(inplace=True))
             self.conv = nn.Sequential(*conv_layers)
             
             dense_layers.append(
                 nn.Linear(
-                    in_features=self.config['LINEAR_INPUT'][0], 
-                    out_features=self.config['LINEAR_OUTPUT'][0]))
+                    in_features=self.__config['LINEAR_INPUT'][0], 
+                    out_features=self.__config['LINEAR_OUTPUT'][0]))
             dense_layers.append(
                 nn.ReLU(inplace=True))
             dense_layers.append(
                 nn.Linear(
-                    in_features=self.config['LINEAR_INPUT'][1], 
-                    out_features=self.config['LINEAR_OUTPUT'][1]))
+                    in_features=self.__config['LINEAR_INPUT'][1], 
+                    out_features=self.__config['LINEAR_OUTPUT'][1]))
             self.dense = nn.Sequential(*dense_layers)
 
         except Exception:
@@ -82,7 +82,7 @@ class SEQ2POINT(nn.Module):
         """
         try:
             x = self.conv(x)
-            x = self.dense(x.view(-1, 50 * self.config['SEQUENCE_LENGTH']))
+            x = self.dense(x.view(-1, 50 * self.__config['SEQUENCE_LENGTH']))
             return x
 
         except Exception as e:

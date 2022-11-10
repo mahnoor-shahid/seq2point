@@ -1,0 +1,6 @@
+
+{
+    "SAMPLING_PERIOD": "8s", 
+    "FILL_VALUE": "0.0", 
+    "WINDOW_LIMIT": "1.0"
+}

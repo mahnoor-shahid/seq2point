@@ -28,18 +28,10 @@ def network_training(model, criterion, optimizer, train_loader, validation_loade
             validation_loss_scores= []
 
             for batch_idx, (data, target) in enumerate(train_loader):
-                print(len(train_loader))
-                print(batch_idx)
+
                 data = data[:, None].type(torch.cuda.FloatTensor).to(set_GPU())
                 target = target[:, None].type(torch.cuda.FloatTensor).to(set_GPU())
-                print('data')
-                print(data.shape)
-                print('targets')
-                print(target.shape)
-                predictions = model.forward(data)[:, None].to(set_GPU())
-                print("predictions")
-                print(predictions.shape)
-
+                predictions = model.forward(data)[:, None].type(torch.cuda.FloatTensor).to(set_GPU())
                 loss = criterion(target, predictions)
                 train_loss_scores.append(loss.item())
                 
@@ -48,7 +40,7 @@ def network_training(model, criterion, optimizer, train_loader, validation_loade
                 optimizer.step()
 
                 if (batch_idx+1) % 10 == 0:
-                    print(f"Epoch : [{epoch+1}/{TRAINING_CONFIG['NUM_EPOCHS']}] | Step : [{batch_idx+1}] | Loss : {loss.item()}")
+                    print(f"Epoch : [{epoch+1}/{TRAINING_CONFIG['NUM_EPOCHS']}] | Step : [{batch_idx+1}/{len(train_loader)}]| Loss : {loss.item()}")
             
             training_loss_per_epoch.append(np.min(train_loss_scores))
             
@@ -57,7 +49,7 @@ def network_training(model, criterion, optimizer, train_loader, validation_loade
                 for batch_idx, (data, target) in enumerate(validation_loader):                                              
                     data = data[:, None].type(torch.cuda.FloatTensor).to(set_GPU())
                     target = target[:, None].type(torch.cuda.FloatTensor).to(set_GPU())                    
-                    predictions = model.forward(data)[:, None].to(set_GPU())
+                    predictions = model.forward(data)[:, None].type(torch.cuda.FloatTensor).to(set_GPU())
                     
                     loss = criterion(target, predictions)
                     validation_loss_scores.append(loss.item())
@@ -65,6 +57,7 @@ def network_training(model, criterion, optimizer, train_loader, validation_loade
             validation_loss_per_epoch.append(np.min(validation_loss_scores))
             
             end_training_time = datetime.datetime.now()
+            print("==================================================================================================================================================")
             print(f"Epoch : [{epoch}/{TRAINING_CONFIG['NUM_EPOCHS']}] | Training Loss : {training_loss_per_epoch[-1]}, | Validation Loss : {validation_loss_per_epoch[-1]}, | Time consumption: {end_training_time-start_training_time}s")
             
             if best_loss is None or best_loss <= validation_loss_per_epoch[-1]:
@@ -73,7 +66,7 @@ def network_training(model, criterion, optimizer, train_loader, validation_loade
             elif best_loss > validation_loss_per_epoch[-1]:
                 best_loss = validation_loss_per_epoch[-1]
                 idle_training_epochs = 0
-                time = time.now()
+                time = datetime.datetime.now().date()
                 model.save_model(filename=f"{time}")  
             else:
                 pass

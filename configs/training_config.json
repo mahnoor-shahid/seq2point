@@ -1,5 +1,7 @@
 {
-    "TRAIN_BATCH_SIZE" : 64,
+    "TRAIN_BATCH_SIZE" : 512,
+    "VALIDATION_BATCH_SIZE" : 512,
+    "TEST_BATCH_SIZE" : 512,
     "LEARNING_RATE" : 0.001,
     "NUM_EPOCHS" : 5,
     "OPTIMIZER": "optim.Adam", 
