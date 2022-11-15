@@ -91,7 +91,7 @@ class SEQ2POINT(nn.Module):
 
     def save_model(self, filename):
         """
-        Save the best model to the disk location specified in general_config.
+        Save the best model to the disk location specified in TRAINING_CONFIG.
         
         Parameter
         ----------
@@ -100,7 +100,7 @@ class SEQ2POINT(nn.Module):
         """
         try:
             print('Saving the model...')
-            torch.save(self.state_dict(), os.path.join(GENERAL_CONFIG['SAVE_PATH'],f'{filename}.pt'))
+            torch.save(self.state_dict(), os.path.join(TRAINING_CONFIG['SAVE_MODEL'],f'{filename}.pt'))
             
         except Exception as e:
             print("Error occured in save_model method due to ", e)
@@ -108,11 +108,11 @@ class SEQ2POINT(nn.Module):
     
     def load_model(self):
         """
-        Loads the best model available on the disk location specified in general_config.
+        Loads the best model available on the disk location specified in TRAINING_CONFIG.
         """
         try:
             print('Loading the model...')
-            self.load_state_dict(torch.load(os.path.join(GENERAL_CONFIG['SAVE_PATH'],GENERAL_CONFIG['LOAD_MODEL'])))
+            self.load_state_dict(torch.load(os.path.join(TRAINING_CONFIG['SAVE_PATH'],TRAINING_CONFIG['LOAD_MODEL'])))
         
         except Exception as e:
             print(f"Error occured in load_model method due to ", e)
@@ -123,7 +123,7 @@ class SEQ2POINT(nn.Module):
         
         """
         try:
-            if GENERAL_CONFIG['PRE_TRAINED_MODEL_FLAG'] == False:
+            if TRAINING_CONFIG['PRE_TRAINED_MODEL_FLAG'] == False:
                 
                 print(f"Followings are the {TRAINING_CONFIG['DESCRIPTION']} of your experiment..")
                 pprint(TRAINING_CONFIG) 
@@ -138,12 +138,12 @@ class SEQ2POINT(nn.Module):
                 train_loss, validation_loss = network_training(self, criterion, optimizer, train_loader, validation_loader)
                 return train_loss, validation_loss
 
-            elif GENERAL_CONFIG['PRE_TRAINED_MODEL_FLAG'] == True:
+            elif TRAINING_CONFIG['PRE_TRAINED_MODEL_FLAG'] == True:
                 model.load_model() ## in progress
                 summary(model, (1,599)) ## in progress
 
             else:
-                raise Exception('In general_config, value specified for PRE_TRAINED_MODEL_FLAG is undefined')
+                raise Exception('In TRAINING_CONFIG, value specified for PRE_TRAINED_MODEL_FLAG is undefined')
         
         except Exception as e:
             print(f"Error occured in run wrapper method due to ", e)
