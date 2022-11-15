@@ -71,7 +71,7 @@ def network_training(model, criterion, optimizer, train_loader, validation_loade
                 best_loss = validation_loss_per_epoch[-1]
                 idle_training_epochs = 0
                 time = datetime.datetime.now().date()
-                model.save_model(filename=f"{time}_best_loss_{best_loss}")  
+                model.save_model(filename=f"{time}_best_loss_{round(best_loss)}")  
             else:
                 pass
             
