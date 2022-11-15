@@ -7,5 +7,8 @@
     "OPTIMIZER": "optim.Adam", 
     "LOSS": "nn.MSELoss",
     "LOSS_REDUCTION": "mean",
-    "EARLY_STOPPING_THRESHOLD": 3
+    "EARLY_STOPPING_THRESHOLD": 3,
+    "PRE_TRAINED_MODEL_FLAG": false,         
+    "SAVE_MODEL": "models/",
+    "LOAD_MODEL": ""
 }
