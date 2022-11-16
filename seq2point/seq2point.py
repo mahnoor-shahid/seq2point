@@ -3,8 +3,9 @@ import torch
 import torch.nn as nn
 from pprint import pprint
 from torchsummary import summary
+import datetime
 from train.training import network_training
-from utils.training_utilities import initialize_weights, set_criterion, set_optimization
+from utils.training_utilities import set_GPU, initialize_weights, set_criterion, set_optimization
 import os
 
             
@@ -112,7 +113,7 @@ class SEQ2POINT(nn.Module):
         """
         try:
             print('Loading the model...')
-            self.load_state_dict(torch.load(os.path.join(TRAINING_CONFIG['SAVE_PATH'],TRAINING_CONFIG['LOAD_MODEL'])))
+            self.load_state_dict(torch.load(os.path.join(TRAINING_CONFIG['LOAD_MODEL'])))
         
         except Exception as e:
             print(f"Error occured in load_model method due to ", e)
@@ -149,23 +150,26 @@ class SEQ2POINT(nn.Module):
             print(f"Error occured in run wrapper method due to ", e)
             
 
-    def inference(test_loader):
+    def inference(model, test_loader):
         """
         """
         try:
-            model.eval()
-            start_test_time = time.time()
+            model.load_model()
+            criterion = set_criterion()
+            
+            start_test_time = datetime.datetime.now()
             test_scores = []
+            model.eval()
             with torch.no_grad():
                 for batch_idx, (data, target) in enumerate(test_loader):
-                    data = data.to(set_device)
+                    data = data.to(set_GPU)
 
                     predictions = model.forward(data)
+                    loss = criterion(target, predictions)
+                    test_scores.append(loss.item())
 
-                    ## progress test_scores.append()
-
-            end_test_time = time.time()
-            print(f"Testing Loss : {training_loss_per_epoch[-1]}, Time consumption: {end_test_time-start_test_time}s")
+            end_test_time = datetime.datetime.now()
+            print(f"Average Test Loss : {np.mean(test_scores)}, Time consumption: {end_test_time-start_test_time}s")
 
 
         except Exception as e:

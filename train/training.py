@@ -10,6 +10,7 @@ def network_training(model, criterion, optimizer, train_loader, validation_loade
     """
     """
     try:
+        print(model)
         print("\nTraining the model architecture...")     
         training_loss_per_epoch = []
         validation_loss_per_epoch = []

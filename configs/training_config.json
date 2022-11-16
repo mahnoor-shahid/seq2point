@@ -10,5 +10,5 @@
     "EARLY_STOPPING_THRESHOLD": 3,
     "PRE_TRAINED_MODEL_FLAG": false,         
     "SAVE_MODEL": "models/",
-    "LOAD_MODEL": ""
+    "LOAD_MODEL": "models/best_model/2022-11-16_best_loss_38102.pt"
 }
