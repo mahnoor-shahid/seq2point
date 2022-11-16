@@ -125,7 +125,7 @@ class SEQ2POINT(nn.Module):
         try:
             if TRAINING_CONFIG['PRE_TRAINED_MODEL_FLAG'] == False:
                 
-                print(f"Followings are the {TRAINING_CONFIG['DESCRIPTION']} of your experiment..")
+                print(f"\nFollowings are the {TRAINING_CONFIG['DESCRIPTION']} of your experiment..")
                 pprint(TRAINING_CONFIG) 
                 self.apply(initialize_weights) 
                 
@@ -149,7 +149,7 @@ class SEQ2POINT(nn.Module):
             print(f"Error occured in run wrapper method due to ", e)
             
 
-    def inference():
+    def inference(test_loader):
         """
         """
         try:
