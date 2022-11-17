@@ -3,11 +3,11 @@
     "VALIDATION_BATCH_SIZE" : 512,
     "TEST_BATCH_SIZE" : 512,
     "LEARNING_RATE" : 0.001,
-    "NUM_EPOCHS" : 5,
+    "NUM_EPOCHS" : 20,
     "OPTIMIZER": "optim.Adam", 
     "LOSS": "nn.MSELoss",
     "LOSS_REDUCTION": "mean",
-    "EARLY_STOPPING_THRESHOLD": 3,
+    "EARLY_STOPPING_THRESHOLD": 5,
     "PRE_TRAINED_MODEL_FLAG": false,         
     "SAVE_MODEL": "models/",
     "LOAD_MODEL": "models/best_model/2022-11-16_best_loss_38102.pt"

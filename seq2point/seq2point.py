@@ -7,6 +7,7 @@ import datetime
 from train.training import network_training
 from utils.training_utilities import set_GPU, initialize_weights, set_criterion, set_optimization
 import os
+import numpy as np
 
             
 class SEQ2POINT(nn.Module):
@@ -100,7 +101,7 @@ class SEQ2POINT(nn.Module):
             Name of the file of the saved model 
         """
         try:
-            print('Saving the model...')
+            print(f"Saving the {filename} model to {TRAINING_CONFIG['LOAD_MODEL']}")
             torch.save(self.state_dict(), os.path.join(TRAINING_CONFIG['SAVE_MODEL'],f'{filename}.pt'))
             
         except Exception as e:
@@ -112,7 +113,7 @@ class SEQ2POINT(nn.Module):
         Loads the best model available on the disk location specified in TRAINING_CONFIG.
         """
         try:
-            print('Loading the model...')
+            print(f"Loading the model...{TRAINING_CONFIG['LOAD_MODEL']}")
             self.load_state_dict(torch.load(os.path.join(TRAINING_CONFIG['LOAD_MODEL'])))
         
         except Exception as e:
@@ -150,21 +151,26 @@ class SEQ2POINT(nn.Module):
             print(f"Error occured in run wrapper method due to ", e)
             
 
-    def inference(model, test_loader):
+    def inference(self, test_loader):
         """
         """
         try:
-            model.load_model()
+            self.load_model()
+
+            print("Model's state_dict:")
+            for param_tensor in self.state_dict():
+                print(param_tensor, "\t", self.state_dict()[param_tensor].size())
+    
             criterion = set_criterion()
             
             start_test_time = datetime.datetime.now()
             test_scores = []
-            model.eval()
+            self.eval()
             with torch.no_grad():
                 for batch_idx, (data, target) in enumerate(test_loader):
-                    data = data.to(set_GPU)
-
-                    predictions = model.forward(data)
+                    data = data[:, None].type(torch.cuda.FloatTensor).to(set_GPU())
+                    target = target[:, None].type(torch.cuda.FloatTensor).to(set_GPU())
+                    predictions = self.forward(data)[:, None].type(torch.cuda.FloatTensor).to(set_GPU())
                     loss = criterion(target, predictions)
                     test_scores.append(loss.item())
 

@@ -63,10 +63,13 @@ def network_training(model, criterion, optimizer, train_loader, validation_loade
             
             end_training_time = datetime.datetime.now()
             print("==================================================================================================================================================")
-            print(f"Epoch : [{epoch}/{TRAINING_CONFIG['NUM_EPOCHS']}] | Training Loss : {training_loss_per_epoch[-1]}, | Validation Loss : {validation_loss_per_epoch[-1]}, | Time consumption: {end_training_time-start_training_time}s")
+            print(f"Epoch : [{epoch+1}/{TRAINING_CONFIG['NUM_EPOCHS']}] | Training Loss : {training_loss_per_epoch[-1]}, | Validation Loss : {validation_loss_per_epoch[-1]}, | Time consumption: {end_training_time-start_training_time}s")
+            print("==================================================================================================================================================")
             
-            if best_loss is None or best_loss <= validation_loss_per_epoch[-1]:
+            if best_loss is None:
                 best_loss = validation_loss_per_epoch[-1]
+                idle_training_epochs = idle_training_epochs + 1
+            elif best_loss <= validation_loss_per_epoch[-1]:
                 idle_training_epochs = idle_training_epochs + 1
             elif best_loss > validation_loss_per_epoch[-1]:
                 best_loss = validation_loss_per_epoch[-1]
