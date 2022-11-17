@@ -4,7 +4,7 @@ import torch.nn as nn
 from pprint import pprint
 from torchsummary import summary
 import datetime
-from train.training import network_training
+from training.train import network_train
 from utils.training_utilities import set_GPU, initialize_weights, set_criterion, set_optimization
 import os
 import numpy as np
@@ -101,7 +101,7 @@ class SEQ2POINT(nn.Module):
             Name of the file of the saved model 
         """
         try:
-            print(f"Saving the {filename} model to {TRAINING_CONFIG['LOAD_MODEL']}")
+            print(f"Saving the {filename} model...\n")
             torch.save(self.state_dict(), os.path.join(TRAINING_CONFIG['SAVE_MODEL'],f'{filename}.pt'))
             
         except Exception as e:
@@ -137,7 +137,7 @@ class SEQ2POINT(nn.Module):
                 criterion = set_criterion()
                 optimizer = set_optimization(self)
 
-                train_loss, validation_loss = network_training(self, criterion, optimizer, train_loader, validation_loader)
+                train_loss, validation_loss = network_train(self, criterion, optimizer, train_loader, validation_loader)
                 return train_loss, validation_loss
 
             elif TRAINING_CONFIG['PRE_TRAINED_MODEL_FLAG'] == True:

@@ -4,14 +4,33 @@ import torch
 from utils.training_utilities import early_stopping, set_GPU
 import datetime
 import numpy as np
+from sklearn.metrics import plot_confusion_matrix, accuracy_score, classification_report
 
 
-def network_training(model, criterion, optimizer, train_loader, validation_loader):
+def save_tensors(target, predictions, epoch, batch_idx):
+    
+    target = target.cpu().detach().numpy().flatten()
+    predictions = predictions.cpu().detach().numpy().flatten()
+
+    if (predictions>30).any() and (target>30).any():
+        np.save(f'training/analysis/learned_target_epoch_{epoch}_batch_{batch_idx}.npy',target)
+        np.save(f'training/analysis/learned_preds_epoch_{epoch}_batch_{batch_idx}.npy',predictions)
+    # elif (target>50).any() and (predictions<30).any():
+    #     np.save(f'training/analysis/target_on_pred_off_epoch_{epoch}_batch_{batch_idx}.npy',target)
+    #     np.save(f'training/analysis/target_on_pred_off_epoch_{epoch}_batch_{batch_idx}.npy',predictions)
+    elif (predictions>50).any() and (target<30).any():
+        np.save(f'training/analysis/target_off_epoch_{epoch}_batch_{batch_idx}.npy',target)
+        np.save(f'training/analysis/pred_on_epoch_{epoch}_batch_{batch_idx}.npy',predictions)
+    else:
+        pass
+
+    
+
+def network_train(model, criterion, optimizer, train_loader, validation_loader):
     """
     """
     try:
-        print(model)
-        print("\nTraining the model architecture...")     
+        print("\n\nTraining the model architecture...")     
         training_loss_per_epoch = []
         validation_loss_per_epoch = []
 
@@ -29,12 +48,19 @@ def network_training(model, criterion, optimizer, train_loader, validation_loade
             validation_loss_scores= []
 
             for batch_idx, (data, target) in enumerate(train_loader):
-
+          
                 data = data[:, None].type(torch.cuda.FloatTensor).to(set_GPU())
                 target = target[:, None].type(torch.cuda.FloatTensor).to(set_GPU())
                 predictions = model.forward(data)[:, None].type(torch.cuda.FloatTensor).to(set_GPU())
+                
+                save_tensors(target, predictions, epoch, batch_idx)
+                
                 loss = criterion(target, predictions)
                 train_loss_scores.append(loss.item())
+                                
+                mse_scores.append(mse(x_data.cpu().detach().numpy(),fgsm_output.cpu().detach().numpy()))
+                psnr_scores.append(psnr(x_data.cpu().detach().numpy(),fgsm_output.cpu().detach().numpy(), MAX=1))
+                sam_scores.append(sam(fgsm_output.cpu().view(1, -1).detach().numpy(),x_data.cpu().view(1, -1).detach().numpy()))
                 
                 optimizer.zero_grad()
                 loss.backward()
@@ -66,13 +92,15 @@ def network_training(model, criterion, optimizer, train_loader, validation_loade
             print(f"Epoch : [{epoch+1}/{TRAINING_CONFIG['NUM_EPOCHS']}] | Training Loss : {training_loss_per_epoch[-1]}, | Validation Loss : {validation_loss_per_epoch[-1]}, | Time consumption: {end_training_time-start_training_time}s")
             print("==================================================================================================================================================")
             
+            checkpoint_loss = np.round(validation_loss_per_epoch[-1],3)
+
             if best_loss is None:
-                best_loss = validation_loss_per_epoch[-1]
+                best_loss = checkpoint_loss
                 idle_training_epochs = idle_training_epochs + 1
-            elif best_loss <= validation_loss_per_epoch[-1]:
+            elif best_loss <= checkpoint_loss:
                 idle_training_epochs = idle_training_epochs + 1
-            elif best_loss > validation_loss_per_epoch[-1]:
-                best_loss = validation_loss_per_epoch[-1]
+            elif best_loss > checkpoint_loss:
+                best_loss = checkpoint_loss
                 idle_training_epochs = 0
                 time = datetime.datetime.now().date()
                 model.save_model(filename=f"{time}_best_loss_{round(best_loss)}")  

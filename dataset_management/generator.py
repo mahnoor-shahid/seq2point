@@ -27,4 +27,5 @@ class Sequence2PointGenerator(torch.utils.data.Dataset):
         return len(self.y)
     
     def __getitem__(self, index):
-        return (torch.tensor(np.array(self.X.iloc[index:index + self.sequence_length])), torch.tensor(np.array(self.y.iloc[[index]])))
+        # return (torch.tensor(np.array(self.X.iloc[index:index + self.sequence_length])), torch.tensor(np.array(self.y.iloc[[index]])))
+        return np.array(self.X.iloc[index:index + self.sequence_length]), np.array(self.y.iloc[[index]])

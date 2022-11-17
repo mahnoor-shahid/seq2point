@@ -40,7 +40,11 @@ def set_criterion():
     """
     
     try:
-        return eval(TRAINING_CONFIG['LOSS'])(reduction=TRAINING_CONFIG['LOSS_REDUCTION'])
+        if bool(TRAINING_CONFIG['LOSS_REDUCTION'])==True:
+            print(f"Loss is set with loss_reduction = {TRAINING_CONFIG['LOSS_REDUCTION']}")
+            return eval(TRAINING_CONFIG['LOSS'])(reduction=TRAINING_CONFIG['LOSS_REDUCTION'])
+        else:
+            return eval(TRAINING_CONFIG['LOSS'])
     
     except Exception as e:
         print("Error occured in set_criterion method due to ", e)
