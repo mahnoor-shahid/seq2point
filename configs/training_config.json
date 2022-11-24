@@ -1,14 +1,14 @@
 {
-    "TRAIN_BATCH_SIZE" : 512,
-    "VALIDATION_BATCH_SIZE" : 512,
-    "TEST_BATCH_SIZE" : 512,
+    "TRAIN_BATCH_SIZE" : 2048,
+    "VALIDATION_BATCH_SIZE" : 64,
+    "TEST_BATCH_SIZE" : 64,
     "LEARNING_RATE" : 0.0001,
     "NUM_EPOCHS" : 20,
     "OPTIMIZER": "optim.Adam", 
-    "LOSS": "nn.L1Loss",
+    "LOSS": "nn.MSELoss",
     "LOSS_REDUCTION": "mean",
-    "EARLY_STOPPING_THRESHOLD": 3,
+    "EARLY_STOPPING_THRESHOLD": 5,
     "PRE_TRAINED_MODEL_FLAG": false,         
     "SAVE_MODEL": "models/",
-    "LOAD_MODEL": "models/best_model/2022-11-17_best_loss_9.pt"
+    "LOAD_MODEL": "models/best_model/2022-11-18_best_loss_65685.pt"
 }

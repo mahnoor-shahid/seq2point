@@ -4,7 +4,7 @@ import torch.nn as nn
 from pprint import pprint
 from torchsummary import summary
 import datetime
-from training.train import network_train
+from training.train import network_train, asses_training
 from utils.training_utilities import set_GPU, initialize_weights, set_criterion, set_optimization
 import os
 import numpy as np
@@ -137,8 +137,8 @@ class SEQ2POINT(nn.Module):
                 criterion = set_criterion()
                 optimizer = set_optimization(self)
 
-                train_loss, validation_loss = network_train(self, criterion, optimizer, train_loader, validation_loader)
-                return train_loss, validation_loss
+                train_loss, validation_loss, tp, tn, fp, fn = network_train(self, criterion, optimizer, train_loader, validation_loader)
+                return train_loss, validation_loss, tp, tn, fp, fn
 
             elif TRAINING_CONFIG['PRE_TRAINED_MODEL_FLAG'] == True:
                 model.load_model() ## in progress
@@ -165,17 +165,29 @@ class SEQ2POINT(nn.Module):
             
             start_test_time = datetime.datetime.now()
             test_scores = []
+            tp, tn, fp, fn = [], [], [], []
             self.eval()
             with torch.no_grad():
                 for batch_idx, (data, target) in enumerate(test_loader):
                     data = data[:, None].type(torch.cuda.FloatTensor).to(set_GPU())
                     target = target[:, None].type(torch.cuda.FloatTensor).to(set_GPU())
-                    predictions = self.forward(data)[:, None].type(torch.cuda.FloatTensor).to(set_GPU())
+                    predictions = self.forward(data)[:, None].type(torch.cuda.FloatTensor).to(set_GPU())               
+                    
                     loss = criterion(target, predictions)
+                    epoch = 0
+                    metrics = asses_training(target, predictions, epoch, batch_idx)
+
+                    tp.append(metrics['tp'])
+                    tn.append(metrics['tn'])
+                    fp.append(metrics['fp'])
+                    fn.append(metrics['fn'])
+
                     test_scores.append(loss.item())
 
             end_test_time = datetime.datetime.now()
             print(f"Average Test Loss : {np.mean(test_scores)}, Time consumption: {end_test_time-start_test_time}s")
+            
+            return test_scores, tp, tn, fp, fn
 
 
         except Exception as e:
