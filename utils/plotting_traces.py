@@ -44,13 +44,13 @@ def plot_traces(traces: list, labels: list, axis_labels: list, colors = None,  t
         ax.set_title(title, alpha=PLOT_CONFIG['OPACITY'])
         ax.set_xlabel(axis_labels[0], alpha=PLOT_CONFIG['OPACITY'])
         ax.set_ylabel(axis_labels[1], alpha=PLOT_CONFIG['OPACITY'])
-        plt.yticks(alpha=PLOT_CONFIG['OPACITY'])
-        plt.xticks(alpha=PLOT_CONFIG['OPACITY'])
-        ax.set_xticks(x)
+        # plt.yticks(alpha=PLOT_CONFIG['OPACITY'])
+        # plt.xticks(alpha=PLOT_CONFIG['OPACITY'])
+        # ax.set_xticks(x)
         ax.grid(True)
         plt.legend(loc=PLOT_CONFIG['LEGEND_LOCATION'])
-        fig.tight_layout()
-        plt.show()
+        # fig.tight_layout()
+        plt.savefig(f'{title}.png')
             
     except Exception as e:
         print("Error occured in plot_traces method due to ", e)

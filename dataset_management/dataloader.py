@@ -1,24 +1,31 @@
 
 
+
 import torch
 import math
 from refit_loader.data_loader import REFIT_Loader
+from refit_loader.utilities.normalisation import normalize
 from dataset_management.generator import Sequence2PointGenerator
 
-
+from sklearn.preprocessing import StandardScaler
+import numpy as np
+import pandas as pd
+import os
+import pickle
 class Seq2PointDataLoader():
     """
     This class creates a REFIT_Loader object to load the data for the target_appliance and provided train, validate and test houses
     Further it resamples that data using the SAMPLING_PERIOD, WINDOW_LIMIT and fill additional nans using FILL_VALUE as specified by 'dataset_config.json'
     Then it creates the generator using Sequence2PointGenerator and use that to create pytorch dataloaders and return those created loaders for training, validation and testing
     """
-    def __init__(self, target_appliance='kettle', target_houses= dict , proportion= {'train_percent':0.7, 'validate_percent':0.2} , subset_days = None):
+    def __init__(self, target_appliance='kettle', target_houses= dict , proportion= {'train_percent':0.7, 'validate_percent':0.2} , subset_days = None, do_normalization = True):
         try:
             self.__target_appliance = target_appliance
             self.__target_houses = target_houses
             self.__proportion = proportion
             self.__subset_days = subset_days
-            
+            self.__do_normalization = do_normalization
+
             if self.__same_house_approach()==True:
 
                 self.__appliance_obj = REFIT_Loader().get_appliance_data(appliance=self.__target_appliance, houses=self.__target_houses['TRAIN'])
@@ -47,6 +54,8 @@ class Seq2PointDataLoader():
             print("Error occured in initialization of Seq2PointDataLoader class due to ", e)
             
         finally:
+            if self.__do_normalization:
+                self.__normalization()
             self.__create_dataloaders()
                 
                     
@@ -73,8 +82,16 @@ class Seq2PointDataLoader():
 
         except Exception as e:
             print("Error occured in __same_house_approach method due to ", e)
-                
-                
+
+
+    def __normalization(self):
+        """
+        """
+        try:
+            print(self)
+        except Exception as e:
+            print("Error occured in __create_dataloaders method due to ", e)
+
     def __create_dataloaders(self):
         """
         """
@@ -97,4 +114,6 @@ class Seq2PointDataLoader():
                                                   num_workers=0, # how many subprocesses to use for data loading (higher = more)
                                                   shuffle=False) # shuffle the data
         except Exception as e:
-            print("Error occured in create_dataloaders method due to ", e)
+            print("Error occured in __create_dataloaders method due to ", e)
+        finally:
+            print("Data Loaders are successfully initialized.\n")

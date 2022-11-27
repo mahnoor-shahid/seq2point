@@ -4,7 +4,7 @@ import torch.nn as nn
 from pprint import pprint
 from torchsummary import summary
 import datetime
-from training.train import network_train, asses_training
+from training.train import network_train, assess_training
 from utils.training_utilities import set_GPU, initialize_weights, set_criterion, set_optimization
 import os
 import numpy as np
@@ -77,7 +77,7 @@ class SEQ2POINT(nn.Module):
             pass
         
         finally:
-            print("\nSEQ2POINT model archiecture has been initialized\n")
+            print("\nSEQ2POINT model archiecture has been initialized.\n")
 
     def forward(self, x):
         """
@@ -120,7 +120,7 @@ class SEQ2POINT(nn.Module):
             print(f"Error occured in load_model method due to ", e)
             
     
-    def run(self, train_loader, validation_loader):
+    def run(self, train_loader, validation_loader, assess_training):
         """
         
         """
@@ -137,8 +137,8 @@ class SEQ2POINT(nn.Module):
                 criterion = set_criterion()
                 optimizer = set_optimization(self)
 
-                train_loss, validation_loss, tp, tn, fp, fn = network_train(self, criterion, optimizer, train_loader, validation_loader)
-                return train_loss, validation_loss, tp, tn, fp, fn
+                results = network_train(self, criterion, optimizer, train_loader, validation_loader, assess_training)
+                return results
 
             elif TRAINING_CONFIG['PRE_TRAINED_MODEL_FLAG'] == True:
                 model.load_model() ## in progress
@@ -193,3 +193,5 @@ class SEQ2POINT(nn.Module):
         except Exception as e:
                 print('Error occured in inference method due to ', e)
             
+
+#%%
