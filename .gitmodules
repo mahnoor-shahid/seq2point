@@ -1,0 +1,3 @@
+[submodule "refit_loader"]
+	path = refit_loader
+	url = https://github.com/mahnoor-shahid/refit_loader.git
