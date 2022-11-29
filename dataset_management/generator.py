@@ -27,4 +27,8 @@ class Sequence2PointGenerator(torch.utils.data.Dataset):
         return len(self.y)
     
     def __getitem__(self, index):
-        return np.array(time.mktime(self.time[index].timetuple())), np.array(self.X.iloc[index:index + self.sequence_length]), np.array(self.y.iloc[[index]])
+        try:
+            return np.array(time.mktime(self.time[index].timetuple())), np.array(self.X.iloc[index:index + self.sequence_length]), np.array(self.y.iloc[[index]])
+        except Exception as e:
+            print("Error occured in __getitem__ method of Sequence2PointGenerator class due to ", e)
+            
