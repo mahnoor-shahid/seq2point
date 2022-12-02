@@ -1,5 +1,5 @@
 {
-    "TARGET_APPLIANCE" : "KETTLE",
+    "TARGET_APPLIANCE" : "washingmachine",
     "TARGET_HOUSES":
         {
             "TRAIN" : [2],

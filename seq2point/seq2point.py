@@ -128,7 +128,7 @@ class SEQ2POINT(nn.Module):
         try:
             if TRAINING_CONFIG['PRE_TRAINED_MODEL_FLAG'] == False:
                 
-                print(f"\nFollowings are the training configuration of your experiment..")
+                print(f"\nFollowings are the {TRAINING_CONFIG['DESCRIPTION']} of your experiment..")
                 pprint(TRAINING_CONFIG) 
                 self.apply(initialize_weights) 
                 
