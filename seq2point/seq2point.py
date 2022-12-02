@@ -102,6 +102,7 @@ class SEQ2POINT(nn.Module):
         """
         try:
             print(f"Saving the {filename} model...\n")
+            TRAINING_CONFIG["LOAD_MODEL"] = os.path.join(TRAINING_CONFIG['SAVE_MODEL'],f'{filename}.pt')
             torch.save(self.state_dict(), os.path.join(TRAINING_CONFIG['SAVE_MODEL'],f'{filename}.pt'))
             
         except Exception as e:
@@ -127,7 +128,7 @@ class SEQ2POINT(nn.Module):
         try:
             if TRAINING_CONFIG['PRE_TRAINED_MODEL_FLAG'] == False:
                 
-                print(f"\nFollowings are the {TRAINING_CONFIG['DESCRIPTION']} of your experiment..")
+                print(f"\nFollowings are the training configuration of your experiment..")
                 pprint(TRAINING_CONFIG) 
                 self.apply(initialize_weights) 
                 
@@ -165,29 +166,22 @@ class SEQ2POINT(nn.Module):
             
             start_test_time = datetime.datetime.now()
             test_scores = []
-            tp, tn, fp, fn = [], [], [], []
             self.eval()
             with torch.no_grad():
-                for batch_idx, (data, target) in enumerate(test_loader):
-                    data = data[:, None].type(torch.cuda.FloatTensor).to(set_GPU())
-                    target = target[:, None].type(torch.cuda.FloatTensor).to(set_GPU())
-                    predictions = self.forward(data)[:, None].type(torch.cuda.FloatTensor).to(set_GPU())               
+                for batch_idx, (timestep, x_value, y_value) in enumerate(test_loader):
+                    timestep = [datetime.datetime.fromtimestamp(each_timestep).strftime('%Y-%m-%d %H:%M:%S') for each_timestep in timestep.numpy()]
+                    x_value = x_value[:, None].type(torch.cuda.FloatTensor).to(set_GPU())
+                    y_value = y_value[:, None].type(torch.cuda.FloatTensor).to(set_GPU())
+                    predictions = self.forward(x_value)[:, None].type(torch.cuda.FloatTensor).to(set_GPU())             
                     
-                    loss = criterion(target, predictions)
-                    epoch = 0
-                    metrics = asses_training(target, predictions, epoch, batch_idx)
-
-                    tp.append(metrics['tp'])
-                    tn.append(metrics['tn'])
-                    fp.append(metrics['fp'])
-                    fn.append(metrics['fn'])
+                    loss = criterion(y_value, predictions)
 
                     test_scores.append(loss.item())
 
             end_test_time = datetime.datetime.now()
             print(f"Average Test Loss : {np.mean(test_scores)}, Time consumption: {end_test_time-start_test_time}s")
             
-            return test_scores, tp, tn, fp, fn
+            return test_scores
 
 
         except Exception as e:

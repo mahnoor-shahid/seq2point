@@ -1,14 +1,30 @@
 {
-    "TRAIN_BATCH_SIZE" : 2048,
+    "TARGET_APPLIANCE" : "KETTLE",
+    "TARGET_HOUSES":
+        {
+            "TRAIN" : [2],
+            "VALIDATE" : [2],
+            "TEST" : [2]
+        },
+    "SPLIT_PROPORTION" :
+        {
+            "TRAIN_PERCENT" : 0.6,
+            "VALIDATE_PERCENT" : 0.2,
+            "TEST_PERCENT" : 0.2
+        },
+    "SUBSET_DAYS": 1,
+    "NORMALIZE": "Standard",
+
+    "TRAIN_BATCH_SIZE" : 512,
     "VALIDATION_BATCH_SIZE" : 64,
     "TEST_BATCH_SIZE" : 64,
     "LEARNING_RATE" : 0.0001,
     "NUM_EPOCHS" : 2,
-    "OPTIMIZER": "optim.Adam", 
+    "OPTIMIZER": "optim.Adam",
     "LOSS": "nn.MSELoss",
     "LOSS_REDUCTION": "mean",
     "EARLY_STOPPING_THRESHOLD": 5,
-    "PRE_TRAINED_MODEL_FLAG": false,         
+    "PRE_TRAINED_MODEL_FLAG": false,
     "SAVE_MODEL": "models/",
-    "LOAD_MODEL": "models/best_model/2022-11-18_best_loss_65685.pt"
+    "LOAD_MODEL": ""
 }

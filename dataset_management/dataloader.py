@@ -60,7 +60,7 @@ class Seq2PointDataLoader():
         """
         """
         try:
-            print('\nCreating dataloaders')
+            print('\nCreating dataloaders...')
             self.__train_generator = Sequence2PointGenerator(self.__train_df)
             self.train_dataloader = torch.utils.data.DataLoader(dataset=self.__train_generator, 
                                                   batch_size=TRAINING_CONFIG['TRAIN_BATCH_SIZE'], # how many samples per batch
