@@ -3,9 +3,5 @@ __pycache__
 .idea
 *.pkl
 
-/models
-/runs
 /data
-/analysis
-/scalers
 /experiments

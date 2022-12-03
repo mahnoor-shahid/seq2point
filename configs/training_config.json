@@ -12,14 +12,14 @@
             "VALIDATE_PERCENT" : 0.2,
             "TEST_PERCENT" : 0.2
         },
-    "SUBSET_DAYS": 1,
+    "SUBSET_DAYS": 10,
     "NORMALIZE": "Standard",
 
     "TRAIN_BATCH_SIZE" : 64,
     "VALIDATION_BATCH_SIZE" : 64,
     "TEST_BATCH_SIZE" : 64,
     "LEARNING_RATE" : 0.0001,
-    "NUM_EPOCHS" : 2,
+    "NUM_EPOCHS" : 5,
     "OPTIMIZER": "optim.Adam",
     "LOSS": "nn.MSELoss",
     "LOSS_REDUCTION": "mean",

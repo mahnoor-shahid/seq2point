@@ -5,20 +5,18 @@ import torch
 from utils.training_utilities import early_stopping, set_GPU
 import datetime
 import numpy as np
-from sklearn.metrics import precision_score, recall_score
+from utils.compute_metrics import compute_TP
 
 
 def fetch_training_reports(epoch, batch_idx, timestep, y_value, predictions):
     
-    threshold = 50
+    threshold = 50.0
     y_value, predictions = y_value.cpu().detach().numpy().flatten(), predictions.cpu().detach().numpy().flatten()
-    df = pd.DataFrame({'time': timestep, 'ground_truth':y_value, 'prediction':predictions}).set_index('time')
-    if predictions>threshold and y_value>threshold:
+
+    if (compute_TP(y_value, predictions, threshold)/TRAINING_CONFIG['TRAIN_BATCH_SIZE'])>0.3:
+        tmp_df = pd.DataFrame({'time': timestep, 'ground_truth': y_value, 'prediction': predictions})
         training_path = os.path.join(TRAINING_CONFIG['EXPERIMENT_PATH'], 'training')
-        df.to_csv(f'{training_path}/epoch_{epoch}_batch_{batch_idx}.csv')
-    # if epoch >8:
-    #     training_path = os.path.join(TRAINING_CONFIG['EXPERIMENT_PATH'], 'training')
-    #     df.to_csv(f'{training_path}/epoch_{epoch}_batch_{batch_idx}.csv')
+        tmp_df.to_csv(f'{training_path}/epoch_{epoch}_batch_{batch_idx}.csv')
 
 def network_train(model, criterion, optimizer, train_loader, validation_loader, assess_training=False):
     """

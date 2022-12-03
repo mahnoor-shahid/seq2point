@@ -11,7 +11,7 @@ class Seq2PointDataLoader():
     Further it resamples that data using the SAMPLING_PERIOD, WINDOW_LIMIT and fill additional nans using FILL_VALUE as specified by 'dataset_config.json'
     Then it creates the generator using Sequence2PointGenerator and use that to create pytorch dataloaders and return those created loaders for training, validation and testing
     """
-    def __init__(self, target_appliance='kettle', target_houses= dict , proportion= dict , subset_days = None, scalers_directory=str, normalize_with = 'standard'):
+    def __init__(self, target_appliance='kettle', target_houses= dict , proportion= dict , subset_days = None, scalers_directory=None, normalize_with = None):
         try:
             self.__target_appliance = target_appliance
             self.__target_houses = target_houses

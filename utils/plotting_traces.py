@@ -2,6 +2,7 @@
 from pprint import pprint
 import matplotlib.pyplot as plt
 import numpy as np
+import os
 
 def get_maximum_step(traces: list):
     highest_val = 0
@@ -19,8 +20,8 @@ def plot_traces(traces: list, labels: list, axis_labels: list, colors = None,  t
     
     """
     try:
-        print(f"\nFollowings are the {PLOT_CONFIG['DESCRIPTION']} of your project..")
-        pprint(PLOT_CONFIG)
+        # print(f"\nFollowings are the {PLOT_CONFIG['DESCRIPTION']} of your project..")
+        # pprint(PLOT_CONFIG)
 
         plt.style.use(PLOT_CONFIG['STYLE'])
         plt.rcParams['text.usetex'] = PLOT_CONFIG['LATEX']
@@ -50,6 +51,10 @@ def plot_traces(traces: list, labels: list, axis_labels: list, colors = None,  t
         ax.grid(True)
         plt.legend(loc=PLOT_CONFIG['LEGEND_LOCATION'])
         fig.tight_layout()
+
+        print(f"Saving the {title} plot...\n")
+        if not os.path.exists(os.path.join(TRAINING_CONFIG['EXPERIMENT_PATH'], 'plots')):
+            os.makedirs(os.path.join(TRAINING_CONFIG['EXPERIMENT_PATH'], 'plots'))
         plot_path = os.path.join(TRAINING_CONFIG['EXPERIMENT_PATH'], 'plots')
         plt.savefig(f'{os.path.join(plot_path, title)}.png')
             
