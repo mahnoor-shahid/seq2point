@@ -4,9 +4,10 @@ import torch.nn as nn
 from pprint import pprint
 from torchsummary import summary
 import datetime
-from training.train import network_train, assess_training
+from training.train import network_train, fetch_training_reports
 from utils.training_utilities import set_GPU, initialize_weights, set_criterion, set_optimization
 import os
+import json
 import numpy as np
 
             
@@ -102,8 +103,11 @@ class SEQ2POINT(nn.Module):
         """
         try:
             print(f"Saving the {filename} model...\n")
-            TRAINING_CONFIG["LOAD_MODEL"] = os.path.join(TRAINING_CONFIG['SAVE_MODEL'],f'{filename}.pt')
-            torch.save(self.state_dict(), os.path.join(TRAINING_CONFIG['SAVE_MODEL'],f'{filename}.pt'))
+            if not os.path.exists(os.path.join(TRAINING_CONFIG['EXPERIMENT_PATH'], 'models')):
+                os.makedirs(os.path.join(TRAINING_CONFIG['EXPERIMENT_PATH'], 'models'))
+
+            TRAINING_CONFIG['BEST_MODEL'] = os.path.join(TRAINING_CONFIG['EXPERIMENT_PATH'], f'models/{filename}.pt')
+            torch.save(self.state_dict(), TRAINING_CONFIG['BEST_MODEL'])
             
         except Exception as e:
             print("Error occured in save_model method due to ", e)
@@ -114,8 +118,8 @@ class SEQ2POINT(nn.Module):
         Loads the best model available on the disk location specified in TRAINING_CONFIG.
         """
         try:
-            print(f"Loading the model...{TRAINING_CONFIG['LOAD_MODEL']}")
-            self.load_state_dict(torch.load(os.path.join(TRAINING_CONFIG['LOAD_MODEL'])))
+            print(f"Loading the model...{TRAINING_CONFIG['BEST_MODEL']}")
+            self.load_state_dict(torch.load(TRAINING_CONFIG['BEST_MODEL']))
         
         except Exception as e:
             print(f"Error occured in load_model method due to ", e)
@@ -127,10 +131,15 @@ class SEQ2POINT(nn.Module):
         """
         try:
             if TRAINING_CONFIG['PRE_TRAINED_MODEL_FLAG'] == False:
-                
+
+                if not os.path.exists(TRAINING_CONFIG['EXPERIMENT_PATH']):
+                    os.makedirs(TRAINING_CONFIG['EXPERIMENT_PATH'])
+                with open(os.path.join(TRAINING_CONFIG['EXPERIMENT_PATH'], 'experiment_config.json'), 'w') as json_file:
+                    json.dump(TRAINING_CONFIG, json_file)
+                self.apply(initialize_weights)
+
                 print(f"\nFollowings are the {TRAINING_CONFIG['DESCRIPTION']} of your experiment..")
-                pprint(TRAINING_CONFIG) 
-                self.apply(initialize_weights) 
+                pprint(TRAINING_CONFIG)
                 
                 print("\nSummary of the model architecture")
                 summary(self, (1,599)) ## in progress

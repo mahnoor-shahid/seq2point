@@ -1,5 +1,5 @@
 {
-    "TARGET_APPLIANCE" : "washingmachine",
+    "TARGET_APPLIANCE" : "KETTLE",
     "TARGET_HOUSES":
         {
             "TRAIN" : [2],
@@ -15,7 +15,7 @@
     "SUBSET_DAYS": 1,
     "NORMALIZE": "Standard",
 
-    "TRAIN_BATCH_SIZE" : 512,
+    "TRAIN_BATCH_SIZE" : 64,
     "VALIDATION_BATCH_SIZE" : 64,
     "TEST_BATCH_SIZE" : 64,
     "LEARNING_RATE" : 0.0001,
@@ -24,7 +24,5 @@
     "LOSS": "nn.MSELoss",
     "LOSS_REDUCTION": "mean",
     "EARLY_STOPPING_THRESHOLD": 5,
-    "PRE_TRAINED_MODEL_FLAG": false,
-    "SAVE_MODEL": "models/",
-    "LOAD_MODEL": ""
+    "PRE_TRAINED_MODEL_FLAG": false
 }

@@ -1,4 +1,5 @@
-
+import os.path
+import pandas as pd
 import torch
 # from torch.utils.tensorboard import SummaryWriter ### in progress
 from utils.training_utilities import early_stopping, set_GPU
@@ -7,14 +8,17 @@ import numpy as np
 from sklearn.metrics import precision_score, recall_score
 
 
-def assess_training(epoch, batch_idx, timestep, y_value, predictions):
+def fetch_training_reports(epoch, batch_idx, timestep, y_value, predictions):
     
     threshold = 50
-    timestep, y_value, predictions = timestep.cpu().detach().numpy().flatten(), y_value.cpu().detach().numpy().flatten(), predictions.cpu().detach().numpy().flatten()
-
-    print(timestep, y_value, predictions)
-
-    
+    y_value, predictions = y_value.cpu().detach().numpy().flatten(), predictions.cpu().detach().numpy().flatten()
+    df = pd.DataFrame({'time': timestep, 'ground_truth':y_value, 'prediction':predictions}).set_index('time')
+    if predictions>threshold and y_value>threshold:
+        training_path = os.path.join(TRAINING_CONFIG['EXPERIMENT_PATH'], 'training')
+        df.to_csv(f'{training_path}/epoch_{epoch}_batch_{batch_idx}.csv')
+    # if epoch >8:
+    #     training_path = os.path.join(TRAINING_CONFIG['EXPERIMENT_PATH'], 'training')
+    #     df.to_csv(f'{training_path}/epoch_{epoch}_batch_{batch_idx}.csv')
 
 def network_train(model, criterion, optimizer, train_loader, validation_loader, assess_training=False):
     """
@@ -26,6 +30,9 @@ def network_train(model, criterion, optimizer, train_loader, validation_loader, 
 
         best_loss, idle_training_epochs = None, 0
         # writer = SummaryWriter(comment='_training_visualization')
+
+        if not os.path.exists(os.path.join(TRAINING_CONFIG['EXPERIMENT_PATH'], 'training')):
+            os.makedirs(os.path.join(TRAINING_CONFIG['EXPERIMENT_PATH'], 'training'))
 
         for epoch in range(0, TRAINING_CONFIG['NUM_EPOCHS']):
 
@@ -47,7 +54,7 @@ def network_train(model, criterion, optimizer, train_loader, validation_loader, 
                 train_loss_scores.append(loss.item())
 
                 if assess_training:
-                    metrics = assess_training(epoch, batch_idx, timestep, y_value, predictions)
+                    fetch_training_reports(epoch, batch_idx, timestep, y_value, predictions)
                 
                 optimizer.zero_grad()
                 loss.backward()
@@ -77,7 +84,7 @@ def network_train(model, criterion, optimizer, train_loader, validation_loader, 
             print(f"Epoch : [{epoch+1}/{TRAINING_CONFIG['NUM_EPOCHS']}] | Training Loss : {training_loss_per_epoch[-1]}, | Validation Loss : {validation_loss_per_epoch[-1]}, | Time consumption: {end_training_time-start_training_time}s")
             print("==================================================================================================================================================")
             
-            checkpoint_loss = np.round(validation_loss_per_epoch[-1],3)
+            checkpoint_loss = validation_loss_per_epoch[-1]
 
             if best_loss is None:
                 best_loss = checkpoint_loss

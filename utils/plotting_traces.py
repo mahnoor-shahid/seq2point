@@ -19,8 +19,8 @@ def plot_traces(traces: list, labels: list, axis_labels: list, colors = None,  t
     
     """
     try:
-        # print(f"\nFollowings are the {PLOT_CONFIG['DESCRIPTION']} of your project..")
-        # pprint(PLOT_CONFIG)
+        print(f"\nFollowings are the {PLOT_CONFIG['DESCRIPTION']} of your project..")
+        pprint(PLOT_CONFIG)
 
         plt.style.use(PLOT_CONFIG['STYLE'])
         plt.rcParams['text.usetex'] = PLOT_CONFIG['LATEX']
@@ -44,13 +44,14 @@ def plot_traces(traces: list, labels: list, axis_labels: list, colors = None,  t
         ax.set_title(title, alpha=PLOT_CONFIG['OPACITY'])
         ax.set_xlabel(axis_labels[0], alpha=PLOT_CONFIG['OPACITY'])
         ax.set_ylabel(axis_labels[1], alpha=PLOT_CONFIG['OPACITY'])
-        # plt.yticks(alpha=PLOT_CONFIG['OPACITY'])
-        # plt.xticks(alpha=PLOT_CONFIG['OPACITY'])
-        # ax.set_xticks(x)
+        plt.yticks(alpha=PLOT_CONFIG['OPACITY'])
+        plt.xticks(alpha=PLOT_CONFIG['OPACITY'])
+        ax.set_xticks(x)
         ax.grid(True)
         plt.legend(loc=PLOT_CONFIG['LEGEND_LOCATION'])
-        # fig.tight_layout()
-        plt.savefig(f'{title}.png')
+        fig.tight_layout()
+        plot_path = os.path.join(TRAINING_CONFIG['EXPERIMENT_PATH'], 'plots')
+        plt.savefig(f'{os.path.join(plot_path, title)}.png')
             
     except Exception as e:
         print("Error occured in plot_traces method due to ", e)
