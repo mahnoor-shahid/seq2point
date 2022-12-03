@@ -5,16 +5,13 @@ import torch
 from utils.training_utilities import early_stopping, set_GPU
 import datetime
 import numpy as np
-from utils.compute_metrics import compute_TP
+from utils.compute_metrics import compute_TP, compute_recall, compute_precision, compute_f1
 
 
-def fetch_training_reports(epoch, batch_idx, timestep, y_value, predictions):
-    
-    threshold = 50.0
-    y_value, predictions = y_value.cpu().detach().numpy().flatten(), predictions.cpu().detach().numpy().flatten()
+def fetch_training_reports(epoch, batch_idx, timestep, y_value, prediction):
 
-    if (compute_TP(y_value, predictions, threshold)/TRAINING_CONFIG['TRAIN_BATCH_SIZE'])>0.3:
-        tmp_df = pd.DataFrame({'time': timestep, 'ground_truth': y_value, 'prediction': predictions})
+    if (compute_TP(y_value, prediction, TRAINING_CONFIG['THRESHOLD'])/TRAINING_CONFIG['TRAIN_BATCH_SIZE'])>0.3:
+        tmp_df = pd.DataFrame({'time': timestep, 'ground_truth': y_value, 'prediction': prediction})
         training_path = os.path.join(TRAINING_CONFIG['EXPERIMENT_PATH'], 'training')
         tmp_df.to_csv(f'{training_path}/epoch_{epoch}_batch_{batch_idx}.csv')
 
@@ -26,6 +23,9 @@ def network_train(model, criterion, optimizer, train_loader, validation_loader, 
         training_loss_per_epoch = []
         validation_loss_per_epoch = []
 
+        recall_per_epoch = []
+        precision_per_epoch = []
+
         best_loss, idle_training_epochs = None, 0
         # writer = SummaryWriter(comment='_training_visualization')
 
@@ -36,23 +36,33 @@ def network_train(model, criterion, optimizer, train_loader, validation_loader, 
 
             if early_stopping(idle_training_epochs):
                 break
-            
-            start_training_time = datetime.datetime.now()
-            model.train()
+
             train_loss_scores = []
             validation_loss_scores = []
+            recall_scores = []
+            precision_scores = []
 
+            start_training_time = datetime.datetime.now()
+            model.train()
             for batch_idx, (timestep, x_value, y_value) in enumerate(train_loader):
-                timestep = [datetime.datetime.fromtimestamp(each_timestep).strftime('%Y-%m-%d %H:%M:%S') for each_timestep in timestep.numpy()]
+
                 x_value = x_value[:, None].type(torch.cuda.FloatTensor).to(set_GPU())
                 y_value = y_value[:, None].type(torch.cuda.FloatTensor).to(set_GPU())
-                predictions = model.forward(x_value)[:, None].type(torch.cuda.FloatTensor).to(set_GPU())
+                prediction = model.forward(x_value)[:, None].type(torch.cuda.FloatTensor).to(set_GPU())
 
-                loss = criterion(y_value, predictions)
+                loss = criterion(y_value, prediction)
                 train_loss_scores.append(loss.item())
 
+                timestep = [datetime.datetime.fromtimestamp(each_timestep).strftime('%Y-%m-%d %H:%M:%S') for
+                            each_timestep in
+                            timestep.numpy()]
+                y_value, prediction = y_value.cpu().detach().numpy().flatten(), prediction.cpu().detach().numpy().flatten()
+
+                recall_scores.append(compute_recall(y_value, prediction, TRAINING_CONFIG['THRESHOLD']))
+                precision_scores.append(compute_precision(y_value, prediction, TRAINING_CONFIG['THRESHOLD']))
+
                 if assess_training:
-                    fetch_training_reports(epoch, batch_idx, timestep, y_value, predictions)
+                    fetch_training_reports(epoch, batch_idx, timestep, y_value, prediction)
                 
                 optimizer.zero_grad()
                 loss.backward()
@@ -62,15 +72,17 @@ def network_train(model, criterion, optimizer, train_loader, validation_loader, 
                     print(f"Epoch : [{epoch+1}/{TRAINING_CONFIG['NUM_EPOCHS']}] | Step : [{batch_idx+1}/{len(train_loader)}]|  Average Training Loss : {np.mean(train_loss_scores)}")
                     
             training_loss_per_epoch.append(np.mean(train_loss_scores))
+            recall_per_epoch.append(np.mean(recall_scores))
+            precision_per_epoch.append(np.mean(precision_scores))
             
             model.eval()
             with torch.no_grad():
                 for batch_idx, (timestep, x_value, y_value) in enumerate(validation_loader):                                              
                     x_value = x_value[:, None].type(torch.cuda.FloatTensor).to(set_GPU())
                     y_value = y_value[:, None].type(torch.cuda.FloatTensor).to(set_GPU())
-                    predictions = model.forward(x_value)[:, None].type(torch.cuda.FloatTensor).to(set_GPU())
+                    prediction = model.forward(x_value)[:, None].type(torch.cuda.FloatTensor).to(set_GPU())
                     
-                    loss = criterion(y_value, predictions)
+                    loss = criterion(y_value, prediction)
                     validation_loss_scores.append(loss.item())
                     
                     if (batch_idx+1) % 20 == 0:
@@ -103,7 +115,7 @@ def network_train(model, criterion, optimizer, train_loader, validation_loader, 
                 # writer.add_histogram(name + '_data', param, epoch)
             # writer.add_scalars("Bleh", {"Check":best_loss}, epoch)
         
-        return (training_loss_per_epoch, validation_loss_per_epoch)
+        return (training_loss_per_epoch, validation_loss_per_epoch, recall_per_epoch, precision_per_epoch)
     
     except Exception as e:
         print("Error occured in network_train method due to ", e)
