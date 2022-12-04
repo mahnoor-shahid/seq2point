@@ -162,6 +162,8 @@ This repository follows the below structure format:
 ├── environment.yml
 |
 ├── readme.md
+|
+|
 ```
 
 ## Downloads
