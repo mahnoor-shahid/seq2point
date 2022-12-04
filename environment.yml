@@ -1,0 +1,11 @@
+name: seq2point_env
+channels:
+  - defaults
+dependencies:
+  - python=3.9.2
+  - numpy=1.23.3
+  - pandas=1.4.2
+  - dask=2021.06.2
+  - json=2.0.9
+  - torch=1.12.1
+  - tensorboard=2.10.0

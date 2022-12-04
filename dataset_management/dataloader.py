@@ -1,7 +1,5 @@
-import os.path
-
+import os
 import torch
-import math
 from refit_loader.data_loader import REFIT_Loader
 from dataset_management.generator import Sequence2PointGenerator
 
