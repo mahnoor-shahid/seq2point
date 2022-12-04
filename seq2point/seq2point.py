@@ -9,6 +9,7 @@ from utils.training_utilities import set_GPU, initialize_weights, set_criterion,
 import os
 import json
 import numpy as np
+from utils.compute_metrics import compute_recall, compute_precision
 
             
 class SEQ2POINT(nn.Module):
@@ -106,7 +107,7 @@ class SEQ2POINT(nn.Module):
             if not os.path.exists(os.path.join(TRAINING_CONFIG['EXPERIMENT_PATH'], 'models')):
                 os.makedirs(os.path.join(TRAINING_CONFIG['EXPERIMENT_PATH'], 'models'))
 
-            TRAINING_CONFIG['BEST_MODEL'] = os.path.join(TRAINING_CONFIG['EXPERIMENT_PATH'], f'models/{filename}.pt')
+            TRAINING_CONFIG['BEST_MODEL'] = os.path.join(os.path.join(TRAINING_CONFIG['EXPERIMENT_PATH'], 'models'), f'{filename}.pt')
             torch.save(self.state_dict(), TRAINING_CONFIG['BEST_MODEL'])
             
         except Exception as e:
@@ -172,26 +173,29 @@ class SEQ2POINT(nn.Module):
                 print(param_tensor, "\t", self.state_dict()[param_tensor].size())
     
             criterion = set_criterion()
-            
-            start_test_time = datetime.datetime.now()
+
             test_scores = []
+            recall_scores = []
+            precision_scores = []
+            start_test_time = datetime.datetime.now()
             self.eval()
             with torch.no_grad():
                 for batch_idx, (timestep, x_value, y_value) in enumerate(test_loader):
                     timestep = [datetime.datetime.fromtimestamp(each_timestep).strftime('%Y-%m-%d %H:%M:%S') for each_timestep in timestep.numpy()]
                     x_value = x_value[:, None].type(torch.cuda.FloatTensor).to(set_GPU())
                     y_value = y_value[:, None].type(torch.cuda.FloatTensor).to(set_GPU())
-                    predictions = self.forward(x_value)[:, None].type(torch.cuda.FloatTensor).to(set_GPU())             
+                    prediction = self.forward(x_value)[:, None].type(torch.cuda.FloatTensor).to(set_GPU())
                     
-                    loss = criterion(y_value, predictions)
-
+                    loss = criterion(y_value, prediction)
                     test_scores.append(loss.item())
 
-            end_test_time = datetime.datetime.now()
-            print(f"Average Test Loss : {np.mean(test_scores)}, Time consumption: {end_test_time-start_test_time}s")
-            
-            return test_scores
+                    y_value, prediction = y_value.cpu().detach().numpy().flatten(), prediction.cpu().detach().numpy().flatten()
 
+                    recall_scores.append(compute_recall(y_value, prediction, TRAINING_CONFIG['THRESHOLD']))
+                    precision_scores.append(compute_precision(y_value, prediction, TRAINING_CONFIG['THRESHOLD']))
+
+            end_test_time = datetime.datetime.now()
+            print(f"Average Test Loss : {np.mean(test_scores)}, Average Recall : {np.mean(recall_scores)}, Average Precision : {np.mean(precision_scores)}, Time consumption: {end_test_time-start_test_time}s")
 
         except Exception as e:
                 print('Error occured in inference method due to ', e)

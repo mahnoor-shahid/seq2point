@@ -13,17 +13,17 @@
             "TEST_PERCENT" : 0.2
         },
     "THRESHOLD": 50.0,
-    "SUBSET_DAYS": 10,
+    "SUBSET_DAYS": 1,
     "NORMALIZE": "Standard",
 
     "TRAIN_BATCH_SIZE" : 64,
     "VALIDATION_BATCH_SIZE" : 64,
     "TEST_BATCH_SIZE" : 64,
     "LEARNING_RATE" : 0.001,
-    "NUM_EPOCHS" : 10,
+    "NUM_EPOCHS" : 12,
     "OPTIMIZER": "optim.Adam",
     "LOSS": "nn.MSELoss",
     "LOSS_REDUCTION": "mean",
-    "EARLY_STOPPING_THRESHOLD": 5,
+    "EARLY_STOPPING_THRESHOLD": 6,
     "PRE_TRAINED_MODEL_FLAG": false
 }
