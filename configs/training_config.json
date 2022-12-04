@@ -13,7 +13,7 @@
             "TEST_PERCENT" : 0.2
         },
     "THRESHOLD": 0.1,
-    "SUBSET_DAYS": 12,
+    "SUBSET_DAYS": 1,
     "NORMALIZE": "Standard",
 
     "TRAIN_BATCH_SIZE" : 64,

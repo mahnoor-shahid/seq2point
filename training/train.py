@@ -1,7 +1,7 @@
 import os.path
 import pandas as pd
 import torch
-# from torch.utils.tensorboard import SummaryWriter ### in progress
+from torch.utils.tensorboard import SummaryWriter
 from utils.training_utilities import early_stopping, set_GPU
 import datetime
 import numpy as np
@@ -10,7 +10,7 @@ from utils.compute_metrics import compute_TP, compute_recall, compute_precision,
 
 def fetch_training_reports(epoch, batch_idx, timestep, y_value, prediction):
 
-    if (compute_TP(y_value, prediction, TRAINING_CONFIG['THRESHOLD'])/TRAINING_CONFIG['TRAIN_BATCH_SIZE'])>0.3:
+    if (compute_TP(y_value, prediction, TRAINING_CONFIG['THRESHOLD'])/TRAINING_CONFIG['TRAIN_BATCH_SIZE']) > 0.3:
         tmp_df = pd.DataFrame({'time': timestep, 'ground_truth': y_value, 'prediction': prediction})
         training_path = os.path.join(TRAINING_CONFIG['EXPERIMENT_PATH'], 'training')
         tmp_df.to_csv(f'{training_path}/epoch_{epoch}_batch_{batch_idx}.csv')
@@ -20,6 +20,8 @@ def network_train(model, criterion, optimizer, train_loader, validation_loader, 
     """
     try:
         print("\n\nTraining the model architecture...")
+
+        writer = SummaryWriter()
         training_loss_per_epoch = []
         validation_loss_per_epoch = []
         recall_per_epoch = []
@@ -75,6 +77,10 @@ def network_train(model, criterion, optimizer, train_loader, validation_loader, 
             recall_per_epoch.append(np.mean(recall_scores))
             precision_per_epoch.append(np.mean(precision_scores))
 
+            writer.add_scalar("training_loss_per_epoch", training_loss_per_epoch[-1], epoch)
+            writer.add_scalar("recall_per_epoch", recall_per_epoch[-1], epoch)
+            writer.add_scalar("precision_per_epoch", precision_per_epoch[-1], epoch)
+
             model.eval()
             with torch.no_grad():
                 for batch_idx, (timestep, x_value, y_value) in enumerate(validation_loader):
@@ -89,6 +95,8 @@ def network_train(model, criterion, optimizer, train_loader, validation_loader, 
                         print(f"Epoch : [{epoch+1}/{TRAINING_CONFIG['NUM_EPOCHS']}] | Step : [{batch_idx+1}/{len(validation_loader)}]|  Average Validation Loss : {np.mean(validation_loss_scores)}")
 
             validation_loss_per_epoch.append(np.mean(validation_loss_scores))
+            writer.add_scalar("validation_loss_per_epoch", validation_loss_per_epoch[-1], epoch)
+
             end_training_time = datetime.datetime.now()
             total_training_time.append(end_training_time-start_training_time)
             print("==================================================================================================================================================")
@@ -118,7 +126,8 @@ def network_train(model, criterion, optimizer, train_loader, validation_loader, 
         print("******************************************************************************************************************************************************")
         print( f"Total Training Time : {np.array(total_training_time).sum()}s")
         print("******************************************************************************************************************************************************")
-        
+        writer.flush()
+        writer.close()
         return (training_loss_per_epoch, validation_loss_per_epoch, recall_per_epoch, precision_per_epoch)
     
     except Exception as e:
