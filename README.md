@@ -159,8 +159,13 @@ This repository follows the below structure format:
 ├── expermiments
 |
 |
-├── environment.yml
+├── main.ipynb
+├── expermiments_report.ipynb
 |
+|
+├── environment.yml
+├── .gitmodules
+├── .gitignore
 ├── readme.md
 |
 |
