@@ -12,8 +12,8 @@
             "VALIDATE_PERCENT" : 0.2,
             "TEST_PERCENT" : 0.2
         },
-    "THRESHOLD": 50.0,
-    "SUBSET_DAYS": 1,
+    "THRESHOLD": 0.1,
+    "SUBSET_DAYS": 12,
     "NORMALIZE": "Standard",
 
     "TRAIN_BATCH_SIZE" : 64,
