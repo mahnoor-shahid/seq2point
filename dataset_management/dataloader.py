@@ -9,13 +9,13 @@ class Seq2PointDataLoader():
     Further it resamples that data using the SAMPLING_PERIOD, WINDOW_LIMIT and fill additional nans using FILL_VALUE as specified by 'dataset_config.json'
     Then it creates the generator using Sequence2PointGenerator and use that to create pytorch dataloaders and return those created loaders for training, validation and testing
     """
-    def __init__(self, target_appliance='kettle', target_houses= dict , proportion= dict , subset_days = None, scalers_directory=None, normalize_with = None):
+    def __init__(self):
         try:
-            self.__target_appliance = target_appliance
-            self.__target_houses = target_houses
-            self.__subset_days = subset_days
-            self.__normalize_with = normalize_with
-            self.__proportion = proportion
+            self.__target_appliance = target_appliance=TRAINING_CONFIG['TARGET_APPLIANCE']
+            self.__target_houses = TRAINING_CONFIG['TARGET_HOUSES']
+            self.__subset_days = TRAINING_CONFIG['SUBSET_DAYS']
+            self.__normalize_with = TRAINING_CONFIG['NORMALIZE']
+            self.__proportion = TRAINING_CONFIG['SPLIT_PROPORTION']
 
             self.__appliance_obj = REFIT_Loader().get_appliance_data(appliance=self.__target_appliance,
                                                                          houses=[house for lst_houses in [self.__target_houses['TRAIN'],
@@ -30,7 +30,7 @@ class Seq2PointDataLoader():
             self.__appliance_obj.get_proportioned_data(target_houses=self.__target_houses, splits_proportion=self.__proportion)
                 
             if bool(self.__normalize_with)==True:
-                self.__appliance_obj.normalize(scaler=self.__normalize_with, scalars_directory=os.path.join(scalers_directory, 'scalers'), training = True)
+                self.__appliance_obj.normalize(scaler=self.__normalize_with, scalars_directory=os.path.join(TRAINING_CONFIG['EXPERIMENT_PATH'], 'scalers'), training = True)
 
             self.__train_df, self.__val_df, self.__test_df = self.__appliance_obj.splits['TRAIN'], self.__appliance_obj.splits['VALIDATE'], self.__appliance_obj.splits['TEST']
             self.__create_dataloaders()

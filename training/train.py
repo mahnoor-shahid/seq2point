@@ -60,8 +60,8 @@ def network_train(model, criterion, optimizer, train_loader, validation_loader, 
                             timestep.numpy()]
                 y_value, prediction = y_value.cpu().detach().numpy().flatten(), prediction.cpu().detach().numpy().flatten()
 
-                recall_scores.append(compute_recall(y_value, prediction, TRAINING_CONFIG['THRESHOLD']))
-                precision_scores.append(compute_precision(y_value, prediction, TRAINING_CONFIG['THRESHOLD']))
+                recall_scores.append(compute_recall(y_value, prediction, threshold=10.0))
+                precision_scores.append(compute_precision(y_value, prediction, threshold=10.0))
 
                 if assess_training:
                     fetch_training_reports(epoch, batch_idx, timestep, y_value, prediction)

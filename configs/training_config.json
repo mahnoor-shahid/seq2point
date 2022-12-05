@@ -1,10 +1,10 @@
 {
-    "TARGET_APPLIANCE" : "KETTLE",
+    "TARGET_APPLIANCE" : "MICROWAVE",
     "TARGET_HOUSES":
         {
-            "TRAIN" : [2],
-            "VALIDATE" : [2],
-            "TEST" : [2]
+            "TRAIN" : [2,3,4],
+            "VALIDATE" : [2,3,4],
+            "TEST" : [2,3,4]
         },
     "SPLIT_PROPORTION" :
         {
@@ -12,14 +12,14 @@
             "VALIDATE_PERCENT" : 0.2,
             "TEST_PERCENT" : 0.2
         },
-    "THRESHOLD": 0.1,
-    "SUBSET_DAYS": 1,
+    "THRESHOLD": 100.0,
+    "SUBSET_DAYS": 10,
     "NORMALIZE": "Standard",
 
-    "TRAIN_BATCH_SIZE" : 64,
-    "VALIDATION_BATCH_SIZE" : 64,
-    "TEST_BATCH_SIZE" : 64,
-    "LEARNING_RATE" : 0.001,
+    "TRAIN_BATCH_SIZE" : 1000,
+    "VALIDATION_BATCH_SIZE" : 1000,
+    "TEST_BATCH_SIZE" : 1000,
+    "LEARNING_RATE" : 0.0001,
     "NUM_EPOCHS" : 12,
     "OPTIMIZER": "optim.Adam",
     "LOSS": "nn.MSELoss",
