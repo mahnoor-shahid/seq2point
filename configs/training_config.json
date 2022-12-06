@@ -2,9 +2,9 @@
     "TARGET_APPLIANCE" : "MICROWAVE",
     "TARGET_HOUSES":
         {
-            "TRAIN" : [2,3,4],
-            "VALIDATE" : [2,3,4],
-            "TEST" : [2,3,4]
+            "TRAIN" : [2],
+            "VALIDATE" : [2],
+            "TEST" : [2]
         },
     "SPLIT_PROPORTION" :
         {
