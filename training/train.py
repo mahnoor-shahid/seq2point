@@ -8,9 +8,9 @@ import numpy as np
 from utils.compute_metrics import compute_TP, compute_recall, compute_precision, compute_f1
 
 
-def fetch_training_reports(epoch, batch_idx, timestep, y_value, prediction):
+def fetch_training_reports(epoch, batch_idx, timestep, y_value, prediction, threshold):
 
-    if (compute_TP(y_value, prediction, TRAINING_CONFIG['THRESHOLD'])/TRAINING_CONFIG['TRAIN_BATCH_SIZE']) > 0.3:
+    if (compute_TP(y_value, prediction, threshold)/TRAINING_CONFIG['TRAIN_BATCH_SIZE']) > 0.:
         tmp_df = pd.DataFrame({'time': timestep, 'ground_truth': y_value, 'prediction': prediction})
         training_path = os.path.join(TRAINING_CONFIG['EXPERIMENT_PATH'], 'training')
         tmp_df.to_csv(f'{training_path}/epoch_{epoch}_batch_{batch_idx}.csv')
@@ -64,7 +64,7 @@ def network_train(model, criterion, optimizer, train_loader, validation_loader, 
                 precision_scores.append(compute_precision(y_value, prediction, threshold=10.0))
 
                 if assess_training:
-                    fetch_training_reports(epoch, batch_idx, timestep, y_value, prediction)
+                    fetch_training_reports(epoch, batch_idx, timestep, y_value, prediction, threshold=10.0)
 
                 optimizer.zero_grad()
                 loss.backward()
