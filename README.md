@@ -87,6 +87,7 @@ git submodule update --remote
 TRAINING_CONFIG['EXPERIMENT_PATH'] = f'experiments/{TRAINING_CONFIG["TARGET_APPLIANCE"]}/{TRAINING_CONFIG["TARGET_HOUSES"]["TRAIN"]}/'
 ```
 
+
 ## Repository_Structure
 This repository follows the below structure format:
 ```
