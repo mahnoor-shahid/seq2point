@@ -3,6 +3,7 @@
 > Ready and easy to implement a complete end-to-end machine learning pipeline for training the archiecture of seq2point model for energy disaggregation. This project uses refit_loader as a submodule which has taken the advantage of **Dask Dataframes** to ease and fasten the process of loading all the data of REFIT dataset and also provides some data transformation functionalities. 
 
 
+
 ### Sequence-to-point learning with neural networks for nonintrusive load monitoring
 
 In this research, authors have proposed sequence-to-point learning, where the input is a window of the mains and the output is a single point of the target appliance. They have used convolutional neural networks to train the model. They showed that the convolutional neural networks can inherently learn the signatures of the target appliances, which are automatically added into the model to reduce the identifiability problem and haved showed that the method achieve state-of-the-art performance. <br />
