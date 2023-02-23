@@ -36,9 +36,9 @@ conda activate seq2point_env
 git clone https://github.com/mahnoor-shahid/seq2point
 ```
 
-2) This project uses refit_loader as a submodule. Better to upgrade it to ensure latest version of submodule is being used.
+2) This project uses nilm-analyzer python package. Use the following command to install the package.
 ```
-git submodule update --remote
+pip install nilm-analyzer
 ```
 
 3) [Download](#downloads) the refit dataset and it must be located in the data folder as specified by config.json file of refit_loader. (If not sure where data folder should be located, take a reference from [repository structure](#repository_structure))
